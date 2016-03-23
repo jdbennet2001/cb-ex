@@ -197,8 +197,10 @@ function update_series( series ){
 
 		function(previous, next) {
 			return previous.then(function(result) {
-				var record = series[next];
-				return couchDB.insert('series', next, record);
+				var location = series[next];
+				var path = S(location).chompLeft(target_dir).s;
+
+				return couchDB.insert('series', next, { path: path, index: next} );
 			});
 
 		}, Promise.resolve());
