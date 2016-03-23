@@ -91,35 +91,77 @@ CouchInstance.prototype.upload = function( database, key, location ){
 
 };
 
-CouchInstance.prototype.addView = function(database, view_name, design_doc_name, map_function) {
+CouchInstance.prototype.addView = function(database, design_doc_name, view_name, map_function) {
 
 	var promise = new Promise(function(resolve, reject) {
 
 		connections[database].then(function(connection) {
 
-			connection.insert({
-				"views": { "directory_contents": {
-						"map": function(doc) {
-							if ( doc.directory && doc.name ){
-								emit(doc.directory, doc.name);
-							}
-						}
-					}
-				}
-			}, '_design/people', function(error, response) {
-				console.log("yay");
-				resolve(response);
+			var vn = view_name;
+			var view = { "views": {} };
+			view.views[view_name] = { 'map' : map_function };
+
+			connection.insert( view, design_doc_name, function(error, response) {
+									console.log("View: " + view_name + ", added.");
+									resolve(response);
+								});
 			});
-		});
 	});
 
 	return promise;
 };
 
+/*
+ Query a view to find documents with a specific key:
+ @param: database name
+ @param: design document name (do not include the '_design/' prefix)
+ @param: view name
+ @param: keys used when filtering results. Example: { keys: ['term1'] }
+ @return: An array of: { _id: .., key: ..., value:...} objects
+ */
+CouchInstance.prototype.queryView = function( database, design_doc_name, view_name, params ){
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connections[database].then(function(connection) {
+
+			connection.view('folders', view_name, params, function(err, body) {
+				if ( err ){
+					reject(err);
+				}else{
+					resolve(body.rows);
+				}
+			});
+		});
+	});
+};
+
+
+/**
+ Return all documents in a given database
+ **/
+CouchInstance.prototype.all = function( database ){
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connections[database].then(function(connection) {
+			connection.list(function(err, body) {
+				if (err)
+					reject(err);
+				else
+					resolve(body.rows);
+			});
+		});
+
+	});
+
+	return promise;
+
+};
 
 /*
  Generate a database connection (create the database if necessary)
- Returns a promise, with the database connection. 
+ Returns a promise, with the database connection.
  */
 function init_db( database ){
 
@@ -189,7 +231,7 @@ CouchInstance.prototype.allocate = function(database){
 
 };
 
-/* 
+/*
  Drop a database
  */
 CouchInstance.prototype.drop = function(database){

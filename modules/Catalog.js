@@ -14,14 +14,24 @@ var Archive 		= require('./Archive');
 var source_dir = nconf.get('source_dir');
 var target_dir = nconf.get('target_dir');
 
-var couchDB = new CouchInstance( ['issues', 'folders', 'covers'] );
+var couchDB = new CouchInstance( ['issues', 'folders', 'series', 'covers'] );
 
 function Catalog(){
 
 	//Add all necessary views
-	debugger;
-	couchDB.addView('issues');
+	var map_function = function(doc) {
+		if (doc.directory && doc.name) {
+			emit(doc.directory, doc.name);
+		}
+	};
 
+	couchDB.addView('issues', '_design/folders', 'folder_name', map_function).then(function(){
+
+		//Query for folder contents
+		var keys =  { keys: [ "/Comic Strips/Calvin and Hobbes/"] };
+		couchDB.queryView('issues', 'folders', 'folder_name', keys);
+
+	});
 
 }
 
@@ -66,6 +76,21 @@ function isSeriesFolder(filename){
 	else{
 		return false;
 	}
+}
+
+function isComicFolder(filename){
+	//Skip metadata
+    if ( S(filename).contains('metadata') ){
+      return false;
+    }
+
+    //Skip mac index files
+    else if ( S(path.basename(filename)).startsWith('.')){
+      return false;
+    }
+    else{
+    	return true;
+    }
 }
 
 function getArchiveSummary( filename, stat ){
@@ -166,6 +191,45 @@ function update_cover( filename ){
 
 function update_series( series ){
 
+	var counter = 0;
+
+	var promise = Object.keys(series).reduce(
+
+		function(previous, next) {
+			return previous.then(function(result) {
+				var record = series[next];
+				return couchDB.insert('series', next, record);
+			});
+
+		}, Promise.resolve());
+
+	promise.then( function(){
+		console.log( 'Finished updating series.');
+	} );
+
+  	return promise;
+}
+
+function update_folders(folders){
+
+	var counter = 0;
+
+	var promise = folders.reduce(
+
+		function(previous, next) {
+			return previous.then(function(result) {
+				var folder = S(next).chompLeft(target_dir).s;
+				var parent = path.dirname(folder);
+				return couchDB.insert('folders', folder, {path: folder, parent: parent});
+			});
+
+		}, Promise.resolve());
+
+	promise.then( function(){
+		console.log( 'Finished updating series.');
+	} );
+
+  	return promise;
 }
 
 
@@ -178,37 +242,50 @@ Catalog.prototype.update = function(){
 
 	var archives = {};
 	var series = {};
-	var covers = {};
-
+	var folders = [];
 
 	emitter.on('file',function(filename,stat){
-		if ( isCover(filename) ){
-			console.log( ' .. cover: ' + filename );
-			covers[path.basename(filename)] = filename;
-		}else if ( isArchive(filename) ){
+		if ( isArchive(filename) ){
 			console.log( ' .. archive: ' + filename );
 			archives[filename] = stat;
 		}
 	});
 
 	emitter.on('directory',function(filename,stat){
-		if ( isSeriesFolder(filename) ){
+		if ( isSeriesFolder(filename) && isComicFolder(filename)){
 			console.log( ' .. series: ' + filename );
 			var index =  S(filename).between('(', ')' ).s;
 			series[index] = filename;
+		}
+		if (isComicFolder(filename) ){
+			folders.push(filename);
 		}
 	});
 
 	emitter.on('end', function() {
   		console.log( 'Done!');
-  		console.log( 'Archives: ' + Object.keys(archives).length + ", series: " + Object.keys(series).length + ", covers: " + Object.keys(covers).length  );
+  		console.log( 'Archives: ' + Object.keys(archives).length + ", series: " + Object.keys(series).length + ", folders: " + folders.length  );
 
 
-  		// update_issues( archives );
-  		// update_series( series );
-  		update_covers( archives );
+  		update_issues( archives ).then(function(){
+  			debugger;
+  			return update_series(series);
+  		}).then(function(){
+	  		return update_covers( archives );
+  		}).then( function(){
+  			return update_folders(folders);
+  		}).then(function(){
+  			console.log( 'CouchDB ready to go!');
+  		});
   	});
 
 };
+
+Catalog.prototype.all = function(){
+	debugger;
+	couchDB.all('issues').then(function(results){
+		debugger;
+	});
+}
 
 module.exports = new Catalog();

@@ -41,6 +41,7 @@ var host = (process.env.VCAP_APP_HOST || 'localhost');
 var port = (process.env.VCAP_APP_PORT || 3810);
 
 // Catalog.update();
+Catalog.update();
 
 // Start server
 http.createServer(app).listen(port, function() {
