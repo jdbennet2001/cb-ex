@@ -18,6 +18,11 @@ var couchDB = new CouchInstance( ['issues', 'folders', 'covers'] );
 
 function Catalog(){
 
+	//Add all necessary views
+	debugger;
+	couchDB.addView('issues');
+
+
 }
 
 function isArchive(filename){
@@ -99,8 +104,6 @@ function update_issues( issues ){
 }
 
 function update_covers( issues ){
-
-	debugger;
 
 	var promise = Object.keys(issues).reduce(
 

@@ -16,36 +16,10 @@ function CouchInstance(databases){
 
 }
 
-/*
- Generate a database connection (create the database if necessary)
- Returns a promise, with the database connection. 
- */
-function init_db( database ){
 
-	var promise = new Promise(function(resolve, reject) {
-
-		nano.db.list(function(err, body) {
-			if ( body.indexOf(database) > -1 ){
-				console.log( 'Connected to existing database: ' + database );
-				resolve( nano.db.use(database) );
-			}else{
-				nano.db.create(database, function(err, body) {
-					if ( err ){
-						console.log( 'Error connecting to database: ' + database + ', error is: ' + util.inspect(err) );
-						reject(err);
-					}
-					console.log( 'Connected to new database: ' + database );
-					resolve( nano.db.use(database) );
-				});
-			}
-		});
-
-	});
-	return promise;
-}
 
 /*
- Insert a record into the specified database
+ Insert a record into the specified database. Updates an existing record if necessary.
  */
 CouchInstance.prototype.insert = function(database, key, data ){
 
@@ -116,6 +90,60 @@ CouchInstance.prototype.upload = function( database, key, location ){
 	return promise;
 
 };
+
+CouchInstance.prototype.addView = function(database, view_name, design_doc_name, map_function) {
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connections[database].then(function(connection) {
+
+			connection.insert({
+				"views": { "directory_contents": {
+						"map": function(doc) {
+							if ( doc.directory && doc.name ){
+								emit(doc.directory, doc.name);
+							}
+						}
+					}
+				}
+			}, '_design/people', function(error, response) {
+				console.log("yay");
+				resolve(response);
+			});
+		});
+	});
+
+	return promise;
+};
+
+
+/*
+ Generate a database connection (create the database if necessary)
+ Returns a promise, with the database connection. 
+ */
+function init_db( database ){
+
+	var promise = new Promise(function(resolve, reject) {
+
+		nano.db.list(function(err, body) {
+			if ( body.indexOf(database) > -1 ){
+				console.log( 'Connected to existing database: ' + database );
+				resolve( nano.db.use(database) );
+			}else{
+				nano.db.create(database, function(err, body) {
+					if ( err ){
+						console.log( 'Error connecting to database: ' + database + ', error is: ' + util.inspect(err) );
+						reject(err);
+					}
+					console.log( 'Connected to new database: ' + database );
+					resolve( nano.db.use(database) );
+				});
+			}
+		});
+
+	});
+	return promise;
+}
 
 /*
  Insert document, with index and revision, to the database
