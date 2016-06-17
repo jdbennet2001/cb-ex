@@ -3,32 +3,35 @@ var nconf 	= require('nconf');
 var Promise = require('promise');
 var util 	= require('util');
 var fs 		= require('fs');
-var nano 	= require('nano')('http://localhost:5984');
+var S       = require('string');
 
-/* Map of connections names to connection objects (wrapped in Promise objects) */
-var connections = {};
+var url = 'http://localhost:5984';
+var nano    = require('nano')(url);
 
-function CouchInstance(databases){
 
-	databases.forEach( function(database){
-		connections[database] =init_db(database);
-	});
+function CouchInstance(database_name){
+
+	//Connect to the database
+	this.database_name = database_name;
+	this.connection = init_db(database_name);
 
 }
+
 
 
 
 /*
  Insert a record into the specified database. Updates an existing record if necessary.
  */
-CouchInstance.prototype.insert = function(database, key, data ){
+CouchInstance.prototype.insert = function(key, data ){
 
 	//Save the data index for later use
 	data._id = key;
+	var connection = this.connection;
 
 	var promise = new Promise(function(resolve, reject) {
 
-		connections[database].then(function(connection){
+		connection.then(function(connection){
 			add_rev(connection, key, data).then(function(data){
 				return insert_document(connection,data);
 			}).then(function(body){
@@ -45,18 +48,44 @@ CouchInstance.prototype.insert = function(database, key, data ){
 };
 
 /*
- Check if a document with a specified key exists in the database.
+ Insert a record into the specified database. Updates an existing record if necessary.
  */
-CouchInstance.prototype.exists = function(database, key){
+CouchInstance.prototype.delete = function(key, rev){
+
 
 	var promise = new Promise(function(resolve, reject) {
 
-		connections[database].then(function(connection){
-			connection.head( key, function(err,body){
-				if (err )
+		connection.then(function(connection){
+			connection.destroy( key, rev, function(err, body){
+				if (err){
 					reject(err);
-				else
+				}else{
 					resolve(body);
+				}
+			});
+		});
+
+	});
+
+	return promise;
+
+};
+
+/*
+ Check if a document with a specified key exists in the database.
+ */
+CouchInstance.prototype.exists = function(key){
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connection.then(function(connection){
+			connection.head( key, function(err,body){
+				if (err ){
+					reject(err);
+				}
+				else{
+					resolve(body);
+				}
 			});
 		});
 
@@ -68,18 +97,20 @@ CouchInstance.prototype.exists = function(database, key){
 /*
  Upload a file to the database
  */
-CouchInstance.prototype.upload = function( database, key, location ){
+CouchInstance.prototype.upload = function(key, location ){
 
 	var promise = new Promise(function(resolve, reject) {
 
-		connections[database].then(function(connection){
+		connection.then(function(connection){
 
 			fs.readFile(location, function(err, data) {
 			    connection.attachment.insert(key, key, data, 'image/jpg', function(err, body){
-			    	if ( err )
+			    	if ( err ){
 			    		reject(err);
-			    	else
+			    	}
+			    	else{
 			    		resolve(body);
+			    	}
 			    });
 			});
 
@@ -91,11 +122,11 @@ CouchInstance.prototype.upload = function( database, key, location ){
 
 };
 
-CouchInstance.prototype.addView = function(database, design_doc_name, view_name, map_function) {
+CouchInstance.prototype.addView = function(design_doc_name, view_name, map_function) {
 
 	var promise = new Promise(function(resolve, reject) {
 
-		connections[database].then(function(connection) {
+		connection.then(function(connection) {
 
 			var vn = view_name;
 			var view = { "views": {} };
@@ -119,17 +150,23 @@ CouchInstance.prototype.addView = function(database, design_doc_name, view_name,
  @param: keys used when filtering results. Example: { keys: ['term1'] }
  @return: An array of: { _id: .., key: ..., value:...} objects
  */
-CouchInstance.prototype.queryView = function( database, design_doc_name, view_name, params ){
+CouchInstance.prototype.queryView = function(design_doc_name, view_name, params ){
+
+	var connection = this.connection;
 
 	var promise = new Promise(function(resolve, reject) {
 
-		connections[database].then(function(connection) {
+		connection.then(function(connection) {
 
-			connection.view('folders', view_name, params, function(err, body) {
+			connection.view(design_doc_name, view_name, params, function(err, body) {
 				if ( err ){
 					reject(err);
 				}else{
-					resolve(body.rows);
+					if ( body.rows && body.rows.length === 1){
+						resolve( body.rows[0].value );
+					}else{
+						resolve(body.rows);
+					}
 				}
 			});
 		});
@@ -144,12 +181,14 @@ CouchInstance.prototype.all = function( database ){
 
 	var promise = new Promise(function(resolve, reject) {
 
-		connections[database].then(function(connection) {
+		connection.then(function(connection) {
 			connection.list(function(err, body) {
-				if (err)
+				if (err){
 					reject(err);
-				else
+				}
+				else{
 					resolve(body.rows);
+				}
 			});
 		});
 
@@ -158,6 +197,59 @@ CouchInstance.prototype.all = function( database ){
 	return promise;
 
 };
+
+/**
+ Return a set of documents for a  given database.
+
+ Differs from CouchIntance.all by allowing a limit and skip value for pagination
+ **/
+CouchInstance.prototype.list = function(skip, limit ){
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connection.then(function(connection) {
+			connection.list( {include_docs: true, skip:skip, limit: limit, descending: true}, function(err, body) {
+				if (err){
+					reject(err);
+				}
+				else{
+					resolve(body);
+				}
+			});
+		});
+
+	});
+
+	return promise;
+
+};
+
+CouchInstance.prototype.compact = function( ){
+
+	var promise = new Promise(function(resolve, reject) {
+		nano.db.compact(database, function(err, body){
+			if (err){
+				reject(err);
+			}
+			else{
+				resolve(body);
+			}
+		});
+	});
+
+	return promise;
+
+};
+
+/*
+ Wath a data base for changes
+ */
+CouchInstance.prototype.follow = function( callback ){
+
+	this.following.push(callback);
+
+};
+
 
 /*
  Generate a database connection (create the database if necessary)
@@ -168,7 +260,11 @@ function init_db( database ){
 	var promise = new Promise(function(resolve, reject) {
 
 		nano.db.list(function(err, body) {
-			if ( body.indexOf(database) > -1 ){
+
+			if ( err ){
+				return reject(err);
+			}
+			else if ( body.indexOf(database) > -1 ){
 				console.log( 'Connected to existing database: ' + database );
 				resolve( nano.db.use(database) );
 			}else{
@@ -226,21 +322,5 @@ function add_rev(connection, key, data){
 		return promise;
 }
 
-
-CouchInstance.prototype.allocate = function(database){
-
-};
-
-/*
- Drop a database
- */
-CouchInstance.prototype.drop = function(database){
-
-			var promise = new Promise(function(resolve, reject) {
-
-			});
-			return promise;
-
-};
 
 module.exports =  CouchInstance;

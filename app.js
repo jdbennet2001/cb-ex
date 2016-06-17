@@ -50,7 +50,7 @@ http.createServer(app).listen(port, function() {
     console.log('Express server listening on port ' + port);
 });
 
-
+/*   --------------------- Download APIs --------------------- */
 //Get list of comics that need to be filed
 app.get('/downloads', function(req, res){
     var comics = downloads.issues();
@@ -61,4 +61,10 @@ app.get('/downloads', function(req, res){
 //Return the cover for a downloaded issue.
 app.get('/downloads/covers/:cover', function(req, res){
    downloads.cover(req, res);
+ });
+
+ /*   --------------------- ComicVine APIs --------------------- */
+ var comicVine = require('./modules/ComicVine');
+ app.get('/comicvine/suggestions/:query', function(req,res){
+    comicVine.getSuggestions(req,res);
  });
