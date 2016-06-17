@@ -38,6 +38,45 @@
                 return comic_div;
             }
 
+            function getSeries(name){
+              var basename = name.replace(/ *\([^)]*\) */g, "");
+
+              //Pull out all tokens with suspect characters
+              var tokens = basename.split(' ').filter(function(token){
+                  return !S(token).contains('#');
+              });
+
+              var series = tokens.join(' ');
+              return series;
+            }
+
+            function getYear(name){
+
+              var text = S(name).replaceAll('_', ' ').replaceAll('(', ' ').replaceAll(')', ' ').replaceAll('-', ' ').s;
+
+              var years = text.split(' ').filter(function(token){
+                return ( S(token).isNumeric() && S(token).toInt() > 1935 );
+              });
+
+              var year = years.length ? years.pop() : ' ';
+              return year;
+
+            }
+
+            function getNumber(name){
+
+              var text = S(name).replaceAll('_', ' ').replaceAll('(', ' ').replaceAll(')', ' ').replaceAll('#', ' ').s;
+
+              var numbers = text.split(' ').filter(function(token){
+
+                return ( S(token).isNumeric() && S(token).toInt() < 900 );
+              });
+
+              var number = numbers.length ? numbers.pop() : ' ';
+              return number;
+
+            }
+
             function add_click_handler(data) {
 
                 var self = this;
@@ -72,7 +111,15 @@
 
             debugger;
 
-            var div = display_cover(data);
+            var model = this.model = {
+                name: data.name,
+                path: data.path,
+                series: getSeries(data.name),
+                year: getYear(data.name),
+                number: getNumber(data.name)
+            };
+
+            var div = display_cover(model);
             //add_click_handler(div);
 
         }
