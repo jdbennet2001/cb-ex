@@ -1,12 +1,12 @@
-var request = require('request');
-var nconf 	= require('nconf');
-var Promise = require('promise');
-var util 	= require('util');
-var fs 		= require('fs');
-var S       = require('string');
+var request 	= require('request');
+var nconf 		= require('nconf');
+var Promise 	= require('promise');
+var util 			= require('util');
+var fs 				= require('fs');
+var S       	= require('string');
 
 var url = 'http://localhost:5984';
-var nano    = require('nano')(url);
+var nano    	= require('nano')(url);
 
 
 function CouchInstance(database_name){
@@ -47,29 +47,13 @@ CouchInstance.prototype.insert = function(key, data ){
 
 };
 
-/*
- Insert a record into the specified database. Updates an existing record if necessary.
- */
-CouchInstance.prototype.delete = function(key, rev){
+CouchInstance.prototype.get = function(key){
 
 
-	var promise = new Promise(function(resolve, reject) {
-
-		connection.then(function(connection){
-			connection.destroy( key, rev, function(err, body){
-				if (err){
-					reject(err);
-				}else{
-					resolve(body);
-				}
-			});
-		});
-
-	});
-
-	return promise;
 
 };
+
+
 
 /*
  Check if a document with a specified key exists in the database.
@@ -121,135 +105,6 @@ CouchInstance.prototype.upload = function(key, location ){
 	return promise;
 
 };
-
-CouchInstance.prototype.addView = function(design_doc_name, view_name, map_function) {
-
-	var promise = new Promise(function(resolve, reject) {
-
-		connection.then(function(connection) {
-
-			var vn = view_name;
-			var view = { "views": {} };
-			view.views[view_name] = { 'map' : map_function };
-
-			connection.insert( view, design_doc_name, function(error, response) {
-									console.log("View: " + view_name + ", added.");
-									resolve(response);
-								});
-			});
-	});
-
-	return promise;
-};
-
-/*
- Query a view to find documents with a specific key:
- @param: database name
- @param: design document name (do not include the '_design/' prefix)
- @param: view name
- @param: keys used when filtering results. Example: { keys: ['term1'] }
- @return: An array of: { _id: .., key: ..., value:...} objects
- */
-CouchInstance.prototype.queryView = function(design_doc_name, view_name, params ){
-
-	var connection = this.connection;
-
-	var promise = new Promise(function(resolve, reject) {
-
-		connection.then(function(connection) {
-
-			connection.view(design_doc_name, view_name, params, function(err, body) {
-				if ( err ){
-					reject(err);
-				}else{
-					if ( body.rows && body.rows.length === 1){
-						resolve( body.rows[0].value );
-					}else{
-						resolve(body.rows);
-					}
-				}
-			});
-		});
-	});
-};
-
-
-/**
- Return all documents in a given database
- **/
-CouchInstance.prototype.all = function( database ){
-
-	var promise = new Promise(function(resolve, reject) {
-
-		connection.then(function(connection) {
-			connection.list(function(err, body) {
-				if (err){
-					reject(err);
-				}
-				else{
-					resolve(body.rows);
-				}
-			});
-		});
-
-	});
-
-	return promise;
-
-};
-
-/**
- Return a set of documents for a  given database.
-
- Differs from CouchIntance.all by allowing a limit and skip value for pagination
- **/
-CouchInstance.prototype.list = function(skip, limit ){
-
-	var promise = new Promise(function(resolve, reject) {
-
-		connection.then(function(connection) {
-			connection.list( {include_docs: true, skip:skip, limit: limit, descending: true}, function(err, body) {
-				if (err){
-					reject(err);
-				}
-				else{
-					resolve(body);
-				}
-			});
-		});
-
-	});
-
-	return promise;
-
-};
-
-CouchInstance.prototype.compact = function( ){
-
-	var promise = new Promise(function(resolve, reject) {
-		nano.db.compact(database, function(err, body){
-			if (err){
-				reject(err);
-			}
-			else{
-				resolve(body);
-			}
-		});
-	});
-
-	return promise;
-
-};
-
-/*
- Wath a data base for changes
- */
-CouchInstance.prototype.follow = function( callback ){
-
-	this.following.push(callback);
-
-};
-
 
 /*
  Generate a database connection (create the database if necessary)

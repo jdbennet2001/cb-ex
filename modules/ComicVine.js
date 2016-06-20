@@ -7,6 +7,10 @@ var nconf   = require('nconf'),
 var jsonfile = require('jsonfile');
 var fs      = require('fs');
 
+var url = 'http://localhost:5984';
+var nano    	= require('nano')(url);
+
+
 function ComicVine(){
 
 }
