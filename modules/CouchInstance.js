@@ -47,9 +47,24 @@ CouchInstance.prototype.insert = function(key, data ){
 
 };
 
-CouchInstance.prototype.get = function(key){
+CouchInstance.prototype.get = function(key) {
 
+    var connection = this.connection;
 
+    var promise = new Promise(function(resolve, reject) {
+
+        connection.then(function(database) {
+					database.get(key, function(err, body){
+						if ( err ){
+							reject(err);
+						}else{
+							resolve(body);
+						}
+					});
+        });
+    });
+
+    return promise;
 
 };
 

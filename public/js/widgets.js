@@ -96,7 +96,6 @@
                 //Get the suggestions
                 window.currentAJAX =$.getJSON(url, function(data) {
 
-                  debugger;
 
                     window.currentAJAX = undefined;
 

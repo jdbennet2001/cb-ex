@@ -1,71 +1,91 @@
-var nconf   = require('nconf'),
-    S       = require('string'),
-    path    = require('path'),
+var nconf = require('nconf'),
+    S = require('string'),
+    path = require('path'),
     Promise = require('promise'),
-    util    = require('util'),
+    util = require('util'),
     request = require('request');
 var jsonfile = require('jsonfile');
-var fs      = require('fs');
+var fs = require('fs');
 
-var url = 'http://localhost:5984';
-var nano    	= require('nano')(url);
+var CouchDB = require('./CouchInstance');
+var cache = new CouchDB('comic_vine_cache');
 
+function ComicVine() {
 
-function ComicVine(){
-  
 }
 
 /**
  Call ComicVine to get suggestions for a given comic
  **/
-ComicVine.prototype.getSuggestions =function(req, res){
+ComicVine.prototype.getSuggestions = function(req, res) {
 
-        var url = "http://comicvine.gamespot.com/api/search/?api_key=fc5d9ab899fadd849e4cc3305a73bd3b99a3ba1d&format=json&resources=issue";
+    var query = req.params.query;
 
-        var query = req.params.query;
-        // url = url + "&query=" + query;
-        url = url + "&query=" + 'flash%2091';
+    debugger;
 
-        var key = S(query).replaceAll('%20', '').s;
+    cache.get(query).then(function(data) {
+        console.log('Returning query ' + query + ' from cache.');
+        res.send(data.results);
 
-        console.log( 'Querying comic vine for ' + key );
+    }, function(err) {
+        console.log('Empty cache for query ' + query + ', call comic vine.');
+        getSuggestionsFromCV(query).then(function(results) {
+            res.send(results);
+        }, function(err) {
+            res.status(500);
+        });
+    });
+};
 
-        var options = {
-          url: url,
-          headers: {
+
+function getSuggestionsFromCV(query) {
+
+    var url = "http://comicvine.gamespot.com/api/search/?api_key=fc5d9ab899fadd849e4cc3305a73bd3b99a3ba1d&format=json&resources=issue";
+    url = url + "&query=" + 'flash%2091';
+
+    console.log('Querying comic vine for "' + query + '"');
+
+    var options = {
+        url: url,
+        headers: {
             'User-Agent': 'request'
-          }
-        };
+        }
+    };
 
-        request(options, function(err, response, body ){
+    var promise = new Promise(function(resolve, reject) {
 
-            console.log( '.. request complete');
 
-            if ( typeof body == 'string' && is_json(body)){
+        request(options, function(err, response, body) {
+
+            console.log('.. request complete');
+
+            if (typeof body == 'string' && is_json(body)) {
                 body = JSON.parse(body);
-            }else{
-              res.send(500);
-              res.end();
+            } else {
+                reject(body);
             }
 
-            var results = body.results.filter(function(result){
+            var results = body.results.filter(function(result) {
                 return result.resource_type == 'issue';
             });
 
-            res.send(results);
-
+            resolve(results);
         });
 
-};
+    });
 
-function is_json( input ){
+    return promise;
+
+}
+
+function is_json(input) {
 
     var result = false;
 
-    try{
+    try {
         var json = JSON.parse(input);
         result = true;
-    }catch(err){
+    } catch (err) {
 
     }
     return result;

@@ -29,6 +29,7 @@
     "nano": "^6.2.0",
     "nconf": "*",
     "promise": "^7.0.1",
+    "promisify-node": "^0.4.0",
     "request": "^2.51.0",
     "serve-static": "^1.9.2",
     "string": "^3.1.1",
