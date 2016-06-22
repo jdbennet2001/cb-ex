@@ -12,7 +12,7 @@ var nano    	= require('nano')(url);
 
 
 function ComicVine(){
-
+  
 }
 
 /**

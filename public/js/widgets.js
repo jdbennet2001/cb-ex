@@ -77,12 +77,107 @@
 
             }
 
+
+
+
+            function get_suggestions(series, number, year) {
+
+                var filters = ['ECC Ediciones', 'Panini Comics', 'Planeta DeAgostini'];
+
+                var search = '/comicvine/suggestions/' + series + ' ' + number;
+                var url = encodeURI(search);
+
+                // display_running_icon();
+
+                if ( window.currentAJAX ){
+                    window.currentAJAX.abort();
+                }
+
+                //Get the suggestions
+                window.currentAJAX =$.getJSON(url, function(data) {
+
+                  debugger;
+
+                    window.currentAJAX = undefined;
+
+                    data = data.filter( function(entry){
+                        return (entry.resource_type == 'issue');
+                    });
+
+                    //Remove empty entries
+                    data = data.filter(function(entry) {
+                        return !!entry;
+                    });
+
+                    //Filter out known, useless, companies
+                    data = data.filter(function(entry) {
+                        var company = entry.company;
+                        if (filters.indexOf(company) > -1)
+                            return false;
+                        else
+                            return true;
+                    });
+
+                    //TODO: Filter out by year
+                    data = data.filter(function(entry) {
+
+                        if (!year)
+                            return true;
+
+                        var cover_date = entry.cover_date;
+                        if (!cover_date) {
+                            return false;
+                        } else if (cover_date.indexOf(year) > -1) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+
+                    //TODO: Filter out issue
+                    data = data.filter(function(entry) {
+
+                        if (!number)
+                            return true;
+
+                        var issue_number = entry.issue_number;
+                        if (!issue_number) {
+                            return true;
+                        } else if (number == issue_number) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+
+                    //Sort by popularity
+                    data = data.sort(function(a, b) {
+                        var aPop = a.popularity || 0;
+                        var bPop = b.popularity || 0;
+                        return bPop - aPop;
+                    });
+
+                    //Save the suggestions to the internal model
+                    data.forEach(function(entry) {
+                        model.suggestions[entry.id] = entry;
+                    }.bind(this));
+
+                    display_suggestions_on_screen(data);
+
+
+                }.bind(this));
+
+            }
+
             function add_click_handler(data) {
 
                 var self = this;
                 var f = display_cover;
 
+
                 div.click(function(evt) {
+
+                  debugger;
 
                     //Clear any selected issues
                     $('.queue .comic.selected').removeClass('selected');
@@ -109,7 +204,6 @@
                 });
             }
 
-            debugger;
 
             var model = this.model = {
                 name: data.name,
@@ -120,7 +214,7 @@
             };
 
             var div = display_cover(model);
-            //add_click_handler(div);
+            add_click_handler(div);
 
         }
     });

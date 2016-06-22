@@ -18,20 +18,6 @@ var couchDB = new CouchInstance( ['issues', 'folders', 'series', 'covers'] );
 
 function Catalog(){
 
-	//Add all necessary views
-	var map_function = function(doc) {
-		if (doc.directory && doc.name) {
-			emit(doc.directory, doc.name);
-		}
-	};
-
-	couchDB.addView('issues', '_design/folders', 'folder_name', map_function).then(function(){
-
-		//Query for folder contents
-		var keys =  { keys: [ "/Comic Strips/Calvin and Hobbes/"] };
-		couchDB.queryView('issues', 'folders', 'folder_name', keys);
-
-	});
 
 }
 
@@ -64,7 +50,7 @@ function isCover( filename ){
 	}
 	else{
 		return false;
-	}	
+	}
 }
 
 function isSeriesFolder(filename){
@@ -152,14 +138,14 @@ function update_cover( filename ){
 
 		var key = path.basename(filename);
 
-		//Cover in database? 
+		//Cover in database?
 		couchDB.exists('covers', key).then(function(body) {
 
 			console.log('Processing cover for : ' + path.basename(filename) + ' ... skipped.');
 			resolve( body );
 
 		}, function(err) {
-			
+
 			//No?, generate a thumbnail
 			var archive = new Archive(filename);
 			var cover = archive.extractCover();
@@ -173,14 +159,14 @@ function update_cover( filename ){
 				//Upload it..
 				couchDB.upload('covers',key, cover).then(function(body){
 					var tmp_directory = path.join( __dirname, '/../public/tmp');
-					fse.emptyDirSync(tmp_directory); 
+					fse.emptyDirSync(tmp_directory);
 					resolve(body);
 
 				},function(err){
 					debugger;
 					resolve(err);
 				});
-	
+
 
 		});
 
