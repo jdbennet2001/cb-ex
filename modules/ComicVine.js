@@ -36,6 +36,7 @@ ComicVine.prototype.getSuggestions = function(req, res) {
     }, function(err) {
         console.log('Empty cache for query ' + query + ', call comic vine.');
         getSuggestionsFromCV(query).then(function(results) {
+            cache.insert(query, {results: results});
             res.send(results);
         }, function(err) {
             res.status(500);
@@ -49,7 +50,7 @@ ComicVine.prototype.getSuggestions = function(req, res) {
 function getSuggestionsFromCV(query) {
 
     var url = "http://comicvine.gamespot.com/api/search/?api_key=fc5d9ab899fadd849e4cc3305a73bd3b99a3ba1d&format=json&resources=issue";
-    url = url + "&query=" + 'flash%2091';
+    url = url + "&query=" + encodeURIComponent(query);
 
     console.log('Querying comic vine for "' + query + '"');
 
