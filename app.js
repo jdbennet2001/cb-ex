@@ -25,8 +25,6 @@
 var source_dir = nconf.get('source_dir');
 var target_dir = nconf.get('target_dir');
 
-var catalog = require('./modules/Catalog');
-var downloads = require('./modules/Downloads');
 
 
 //Fire up express
@@ -48,6 +46,8 @@ http.createServer(app).listen(port, function() {
 });
 
 /*   --------------------- Download APIs --------------------- */
+var downloads = require('./modules/Downloads');
+
 //Get list of comics that need to be filed
 app.get('/downloads', function(req, res){
     var comics = downloads.issues();
@@ -66,9 +66,9 @@ app.get('/downloads/covers/:cover', function(req, res){
     comicVine.getSuggestions(req,res);
  });
 
- /*   ------------------ Catalog (CouchDB) Infrastructure ----------------- */
- var catalog = require('./modules/Catalog');
- app.get('/catalog/update',function(req,res){
+ /*   ------------ Catalog (CouchDB) Infrastructure ------------- */
+ var catalog = require('./modules/Index');
+ app.get('/index/update',function(req,res){
     catalog.update();
     res.send(200);
  });
