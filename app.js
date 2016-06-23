@@ -42,9 +42,6 @@ app.use(bodyParser());
 var host = (process.env.VCAP_APP_HOST || 'localhost');
 var port = (process.env.VCAP_APP_PORT || 3810);
 
-// Catalog.update();
-//Catalog.update();
-
 // Start server
 http.createServer(app).listen(port, function() {
     console.log('Express server listening on port ' + port);
@@ -67,4 +64,11 @@ app.get('/downloads/covers/:cover', function(req, res){
  var comicVine = require('./modules/ComicVine');
  app.get('/comicvine/suggestions/:query', function(req,res){
     comicVine.getSuggestions(req,res);
+ });
+
+ /*   ------------------ Catalog (CouchDB) Infrastructure ----------------- */
+ var catalog = require('./modules/Catalog');
+ app.get('/catalog/update',function(req,res){
+    catalog.update();
+    res.send(200);
  });

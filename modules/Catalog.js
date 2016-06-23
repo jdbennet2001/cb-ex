@@ -14,10 +14,18 @@ var Archive 		= require('./Archive');
 var source_dir = nconf.get('source_dir');
 var target_dir = nconf.get('target_dir');
 
-var couchDB = new CouchInstance( ['issues', 'folders', 'series', 'covers'] );
+
+var CouchDB = require('./CouchInstance');
+
+//Various tables in CouchDB
+var issue_cache = new CouchDB('issues');
+var folder_cache =  new CouchDB('folders');
+var series_cache = new CouchDB('series');
+var covers_cache = new CouchDB('covers');
+
+var promise_loop = require('../npm_local/promise_loop');
 
 function Catalog(){
-
 
 }
 
@@ -116,20 +124,17 @@ function update_issues( issues ){
 
 function update_covers( issues ){
 
-	var promise = Object.keys(issues).reduce(
+  var keys = Object.keys(issue);
 
-		function(previous, next) {
-			return previous.then(function(result) {
-				return update_cover(next);
-			});
+  var p = promise_loop.array(keys,function(key){
+      return update_cover(key);
+  });
 
-		}, Promise.resolve());
-
-	promise.then( function(){
+	p.then( function(){
 		console.log( 'Finished updating covers.');
 	} );
 
-  	return promise;
+  return p;
 }
 
 function update_cover( filename ){
@@ -175,47 +180,57 @@ function update_cover( filename ){
 	return promise;
 }
 
+/*
+ @input: An JSON object containing all ComicVine series found in the catalog.
+         Format: { series # : location }
+ */
 function update_series( series ){
 
-	var counter = 0;
+  //Find folder, relative to target directory
+  var entries = Object.keys(series).map(function(key){
+    var location = series[key];
+    var entry = {
+        path: S(location).chompLeft(target_dir).s,
+        index: key
+    };
+    return entry;
+  });
 
-	var promise = Object.keys(series).reduce(
+  //Insert data, sequentially, into the cache
+  var promise = promise_loop.array( entries, function(folder){
+                  series_cache.insert(folder.index, folder);
+                });
 
-		function(previous, next) {
-			return previous.then(function(result) {
-				var location = series[next];
-				var path = S(location).chompLeft(target_dir).s;
-
-				return couchDB.insert('series', next, { path: path, index: next} );
-			});
-
-		}, Promise.resolve());
-
+  //All done...
 	promise.then( function(){
 		console.log( 'Finished updating series.');
 	} );
 
-  	return promise;
+  return promise;
+
 }
 
 function update_folders(folders){
 
-	var counter = 0;
+  //Find folder, relative to target directory
+  var entries = folders.map(function(folder){
 
-	var promise = folders.reduce(
+      var entry = {
+        folder : S(folder).chompLeft(target_dir).s,
+        parent : path.dirname(folder)
+      };
 
-		function(previous, next) {
-			return previous.then(function(result) {
-				var folder = S(next).chompLeft(target_dir).s;
-				var parent = path.dirname(folder);
-				return couchDB.insert('folders', folder, {path: folder, parent: parent});
-			});
+      return entry;
+  });
 
-		}, Promise.resolve());
+  //Insert data, sequentially, into the cache
+  var promise = promise_loop.array( entries, function(entry){
+                  folder_cache.insert(entry.folder, entry);
+                });
 
 	promise.then( function(){
-		console.log( 'Finished updating series.');
-	} );
+		console.log( 'Finished updating folders.');
+	});
 
   	return promise;
 }
@@ -269,11 +284,5 @@ Catalog.prototype.update = function(){
 
 };
 
-Catalog.prototype.all = function(){
-	debugger;
-	couchDB.all('issues').then(function(results){
-		debugger;
-	});
-}
 
 module.exports = new Catalog();

@@ -21,8 +21,6 @@ ComicVine.prototype.getSuggestions = function(req, res) {
 
     var query = req.params.query;
 
-    debugger;
-
     cache.get(query).then(function(data) {
         console.log('Returning query ' + query + ' from cache.');
         res.send(data.results);
