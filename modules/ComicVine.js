@@ -14,6 +14,14 @@ function ComicVine() {
 
 }
 
+/*
+ Get information about a given series
+ */
+ ComicVine.prototype.getSeriesInfo = function( req, res ){
+    //TODO...
+ };
+
+
 /**
  Call ComicVine to get suggestions for a given comic
  **/
@@ -34,6 +42,8 @@ ComicVine.prototype.getSuggestions = function(req, res) {
         });
     });
 };
+
+
 
 
 function getSuggestionsFromCV(query) {

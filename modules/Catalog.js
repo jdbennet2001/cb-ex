@@ -38,4 +38,14 @@ Catalog.prototype.series = function(req, res){
 
 };
 
+Catalog.prototype.insert = function(req, res){
+
+  //Move file
+
+  //Update various caches, if necessary
+
+  //Extract cover into catalog
+
+};
+
 module.exports = new Catalog();

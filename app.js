@@ -66,9 +66,25 @@ app.get('/downloads/covers/:cover', function(req, res){
     comicVine.getSuggestions(req,res);
  });
 
+ //Get information about a given series
+ app.get('/comicvine/series/:id', function(req,res){
+    comicVine.getSeriesInfo(req,res);
+ });
+
  /*   ------------ Catalog (CouchDB) Infrastructure ------------- */
- var catalog = require('./modules/Index');
+ var index = require('./modules/Index');
  app.get('/index/update',function(req,res){
-    catalog.update();
+    index.update();
     res.send(200);
+ });
+
+ var catalog = require('./modules/Catalog');
+ //Return information about a given series, if present
+ app.get('/catalog/series/:id', function(req, res){
+   res.send(404);
+ });
+
+ //Insert an archive into the catalog
+ app.post('/catalog/insert', function(req, res){
+   catalog.insert(req, res);
  });
