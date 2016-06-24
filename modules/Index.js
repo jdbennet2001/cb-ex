@@ -29,6 +29,10 @@ function Index(){
 
 }
 
+Index.prototype.indexCover = function(location){
+  update_cover(location);
+};
+
 function isArchive(filename){
 
     //Skip metadata

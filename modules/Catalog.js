@@ -11,6 +11,7 @@ var mv      = require('mv');
 
 var CouchInstance 	= require('./CouchInstance');
 var Archive 		= require('./Archive');
+var index       = require('./Index.js');
 
 var source_dir = nconf.get('source_dir');
 var target_dir = nconf.get('target_dir');
@@ -45,7 +46,9 @@ Catalog.prototype.insert = function(req, res){
   var model = req.body;
 
   //Move file
-  mv(model.source, path.join(model.directory, name), function(err) {
+  var target =  path.join(model.directory, name);
+
+  mv(model.source, target, function(err) {
       if ( err ){
         return res.stats(500).send(err);
       }
@@ -53,8 +56,12 @@ Catalog.prototype.insert = function(req, res){
       res.status(200);
 
       //Update various caches, if necessary
+      series_cache.insert(model.series, { index: series, path: model.directory } );
 
-      //Extract cover into catalog      
+      issues_cache.insert(target, { directory: model.directory, name: model.name, location: target});
+
+      //Extract cover into catalog
+      index.indexCover(target);
 
   });
 
