@@ -68,7 +68,7 @@ app.get('/downloads/covers/:cover', function(req, res){
 
  //Get information about a given series
  app.get('/comicvine/series/:id', function(req,res){
-    comicVine.getSeriesInfo(req,res);
+    comicVine.series(req,res);
  });
 
  /*   ------------ Catalog (CouchDB) Infrastructure ------------- */
@@ -81,10 +81,11 @@ app.get('/downloads/covers/:cover', function(req, res){
  var catalog = require('./modules/Catalog');
  //Return information about a given series, if present
  app.get('/catalog/series/:id', function(req, res){
-   res.send(404);
+   catalog.series(req,res);
  });
 
  //Insert an archive into the catalog
  app.post('/catalog/insert', function(req, res){
+   debugger;
    catalog.insert(req, res);
  });

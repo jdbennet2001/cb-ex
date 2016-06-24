@@ -8,11 +8,15 @@ $.getJSON('/downloads', function(data) {
 });
 
 
-//Watch for selection change events
+
+
+
+
+/*
+ Selection change event
+ */
 var queue = document.querySelector('.queue');
 queue.addEventListener("selection", function(e) {
-
-  debugger;
 
 	console.info("Event is: ", e);
 	console.info("Model data is: ", e.detail);

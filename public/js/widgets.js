@@ -89,7 +89,6 @@
 
                 div.click(function(evt) {
 
-                  debugger;
 
                     //Clear any selected issues
                     $('.queue .comic.selected').removeClass('selected');
@@ -123,6 +122,9 @@
 
             var div = display_cover(model);
             add_click_handler(div, model);
+
+            //Cache data for later reference
+            div.data('model', model );
 
         }
     });

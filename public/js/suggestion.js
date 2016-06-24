@@ -70,6 +70,9 @@
                 select_suggestion(this);
             });
 
+            //Cache data in the DOM
+            comic.data('model', entry);
+
         }
     });
 })(jQuery);

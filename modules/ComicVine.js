@@ -44,6 +44,30 @@ ComicVine.prototype.getSuggestions = function(req, res) {
     });
 };
 
+/*
+ Given an issue, find information about its parent series
+ */
+ComicVine.prototype.series =function( req, res ){
+
+    var id = req.params.id;
+    var url = "http://www.comicvine.com/api/volume/4050-" + id + '/';
+    var query = "?api_key=fc5d9ab899fadd849e4cc3305a73bd3b99a3ba1d&format=json&field_list=publisher,start_year,name";
+
+
+    var options = {
+        url: url + query,
+        headers: {
+            'User-Agent': 'request'
+        }
+    };
+
+    request(options, function(error, response, body) {
+        var data = JSON.parse(body);
+        res.send( data.results );
+    });
+
+};
+
 
 
 
@@ -60,6 +84,7 @@ function getSuggestionsFromCV(query) {
             'User-Agent': 'request'
         }
     };
+
 
     var promise = new Promise(function(resolve, reject) {
 
