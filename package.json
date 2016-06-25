@@ -26,6 +26,7 @@
     "left-pad": "^1.1.0",
     "list-directory-contents": "0.0.3",
     "method-override": "^2.3.2",
+    "mv": "^2.1.1",
     "nano": "^6.2.0",
     "nconf": "*",
     "promise": "^7.0.1",

@@ -46,7 +46,7 @@ Downloads.prototype.cover = function(req, res){
       res.sendfile( cover );
   }else{
       console.log( cover + " does not exist.");
-      res.sendFile( __dirname + '/public/icons/balloon.png');
+      res.sendFile( process.cwd() + '/public/icons/balloon.png');
   }
 
 };

@@ -1,5 +1,4 @@
 
-
 //Display list of queued Comics
 $.getJSON('/downloads', function(data) {
     data.forEach(function(entry){
@@ -8,9 +7,55 @@ $.getJSON('/downloads', function(data) {
 });
 
 
+/*
+ Cache information for all pending comicss
+ */
+ $.getScript('/js/actions/action-cache.js');
+ $('#cache-action').click(function(){
+
+   //Get the model for each queued issue.
+   var models = [];
+   $('.comic').each(function(comic){
+      var model = $(this).data('model');
+      models.push( model );
+   });
+
+   //Filter out anything without a year and number
+   models = models.filter(function(model){
+     var year = model.year ? model.year.trim() : undefined;
+     var number = model.number ? model.number.trim() : undefined;
+     return (year && number );
+   });
+
+    var action = new cache_action();
+    action.run(models);
+
+ });
+
+/*
+ Import a comic into the catalog
+ */
+ $.getScript('/js/actions/action-file.js');
+ $('#import-action').click(function(){
+
+   var queued = $('.queue .selected');
+   var selected = $('.candidates .selected');
 
 
+   if ( queued.length === 0 || selected.length === 0 ){
+     return;
+   }
 
+   var action = new file_action();
+   var p = action.run(queued.data('model'), selected.data('model') );
+
+   p.then(function(){
+     $('.selected').remove();
+   }, function(err){
+     console.log( 'Error filing issue: ' + err );
+   });
+
+ });
 
 /*
  Selection change event
@@ -24,8 +69,17 @@ queue.addEventListener("selection", function(e) {
   //Clear the suggestion area
   $('.candidates').empty();
 
+  $('body').spinner('Loading...');
+
   //Display new suggestions
-  get_suggestions( e.detail.series, e.detail.number, e.detail.year);
+  var p = get_suggestions( e.detail.series, e.detail.number, e.detail.year);
+
+  p.then(function(result){
+    $('.jqSpinnerDialog').remove();
+  },function(err){
+    $('.jqSpinnerDialog').remove();
+    console.log('Error retrieving data: ' + err );
+  });
 
 });
 
@@ -33,7 +87,10 @@ function get_suggestions(series, number, year) {
 
     var filters = ['ECC Ediciones', 'Panini Comics', 'Planeta DeAgostini'];
 
-    var search = '/comicvine/suggestions/' + series + ' ' + number;
+    var search = '/comicvine/suggestions/' + series;
+    if ( number && S(number).isNumeric() ){
+      search += ' ' + S(number).toInt();
+    }
     var url = encodeURI(search);
 
     // display_running_icon();
@@ -43,7 +100,7 @@ function get_suggestions(series, number, year) {
     }
 
     //Get the suggestions
-    window.currentAJAX =$.getJSON(url, function(data) {
+    var p = window.currentAJAX =$.getJSON(url, function(data) {
 
 
         window.currentAJAX = undefined;
@@ -66,6 +123,24 @@ function get_suggestions(series, number, year) {
                 return true;
         });
 
+
+        //Sort by popularity
+        data = data.sort(function(a, b) {
+            var aPop = a.popularity || 0;
+            var bPop = b.popularity || 0;
+            return bPop - aPop;
+        });
+
+        //And year...
+        data = data.sort(function(a, b) {
+            var aPop = a.cover_date || 0;
+            var bPop = b.cover_date || 0;
+            return bPop - aPop;
+        });
+
+        var candidates = JSON.parse(JSON.stringify(data));
+
+
         //TODO: Filter out by year
         data = data.filter(function(entry) {
 
@@ -81,6 +156,9 @@ function get_suggestions(series, number, year) {
                 return false;
             }
         });
+
+        //Empty matches, ignore that filter..
+        data = data.length ? data : candidates;
 
         //TODO: Filter out issue
         data = data.filter(function(entry) {
@@ -98,12 +176,8 @@ function get_suggestions(series, number, year) {
             }
         });
 
-        //Sort by popularity
-        data = data.sort(function(a, b) {
-            var aPop = a.popularity || 0;
-            var bPop = b.popularity || 0;
-            return bPop - aPop;
-        });
+        //Empty matches, ignore that filter..
+        data = data.length ? data : candidates;
 
         //Save the suggestions to the internal model
         data.forEach(function(entry, index) {
@@ -112,5 +186,7 @@ function get_suggestions(series, number, year) {
 
 
     }.bind(this));
+
+    return p;
 
 }

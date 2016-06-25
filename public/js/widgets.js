@@ -46,6 +46,16 @@
                   return !S(token).contains('#');
               });
 
+              //Pull out any numbers
+              tokens = tokens.filter(function(token){
+                   return !S(token).isNumeric();
+              });
+
+              //And version strings
+              tokens = tokens.filter(function(token){
+              	return !token.match(/^v\d/i);
+              });
+
               var series = tokens.join(' ');
               return series;
             }
