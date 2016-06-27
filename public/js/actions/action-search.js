@@ -24,6 +24,8 @@ search_action.prototype.run =function(model){
                     value: message
                 }).appendTo(main_div);
 
+                input.focus();
+
                 var okay = $('<div/>', {
                     "class": "button ok",
                     "text": "Okay"
