@@ -238,3 +238,40 @@ body {
   margin-left: 10px;
   width: 380px;
 }
+
+.jqSearchDialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 100px;
+    background-color: gray;
+    border-radius: 10px;
+    z-index: 25;
+}
+
+.jqSearchDialog .button {
+    width: 75px;
+    border: 1px solid black;
+    text-align: center;
+    padding: 5px;
+}
+
+.jqSearchDialog .button.ok {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+.jqSearchDialog .button.cancel {
+    position: absolute;
+    right: 95px;
+    bottom: 10px;
+}
+
+.jqSearchDialog #search {
+    position: absolute;
+    top: 23px;
+    width: 350px;
+    left: 25px;
+}

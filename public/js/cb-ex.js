@@ -58,6 +58,21 @@ $.getJSON('/downloads', function(data) {
  });
 
 /*
+ -------- Search Dialog -----------
+ */
+ $.getScript('/js/actions/action-search.js');
+ $('#search-action').click(function(){
+
+   var selected = $('.queue .selected');
+   if ( selected.length === 0 ){
+     return;
+   }
+
+   var action = new search_action(selected.data('model'));
+   action.run();
+ });
+
+/*
  Selection change event
  */
 var queue = document.querySelector('.queue');
