@@ -85,10 +85,12 @@ $.getScript('/js/actions/action-suggestions.js');
 var queue = document.querySelector('.queue');
 queue.addEventListener("selection", function(e) {
 
+  debugger;
+
 	console.info("Event is: ", e);
 	console.info("Model data is: ", e.detail);
 
-  var action = action_suggestions();
-  action.run( model.detail );
+  var action = new action_suggestions();
+  action.run( e.detail.series, e.detail.number, e.detail.year );
 
 });

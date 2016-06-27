@@ -277,7 +277,6 @@ Index.prototype.update = function(){
 
 
   		update_issues( archives ).then(function(){
-  			debugger;
   			return update_series(series);
   		}).then(function(){
 	  		return update_covers( archives );
