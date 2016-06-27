@@ -62,17 +62,10 @@ function get_suggestions(series, number, year) {
         });
 
 
-        //Sort by popularity
-        data = data.sort(function(a, b) {
-            var aPop = a.popularity || 0;
-            var bPop = b.popularity || 0;
-            return bPop - aPop;
-        });
-
         //And year...
         data = data.sort(function(a, b) {
-            var aPop = a.cover_date || 0;
-            var bPop = b.cover_date || 0;
+            var aPop = new Date(a.cover_date);
+            var bPop = new Date(b.cover_date);
             return bPop - aPop;
         });
 

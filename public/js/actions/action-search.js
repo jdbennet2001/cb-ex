@@ -4,6 +4,7 @@ function search_action(){
 
 search_action.prototype.run =function(model){
 
+  debugger;
   $('body').search_dialog(model.name);
 
 };
@@ -18,9 +19,9 @@ search_action.prototype.run =function(model){
                     "class": 'jqSearchDialog'
                 }).appendTo('body');
 
-                var cover = $('<input />', {
+                var input = $('<input />', {
                     id: 'search',
-                    text: message
+                    value: message
                 }).appendTo(main_div);
 
                 var okay = $('<div/>', {
@@ -29,7 +30,8 @@ search_action.prototype.run =function(model){
                 }).appendTo(main_div);
 
                 okay.click(function(){
-                    var value = $(this).value();
+                    debugger;
+                    var value = input.val();
                     hide();
                     action_okay(value);
                 });
@@ -50,21 +52,11 @@ search_action.prototype.run =function(model){
               $('.jqSearchDialog').remove();
             }
 
-            function action_okay(){
+            function action_okay(value){
 
-              //Clear the suggestion area
-              $('.candidates').empty();
-
-              $('body').spinner('Loading...');
-
-              var p = get_suggestions( e.detail.series, e.detail.number, e.detail.year);
-
-              p.then(function(result){
-                $('.jqSpinnerDialog').remove();
-              },function(err){
-                $('.jqSpinnerDialog').remove();
-                console.log('Error retrieving data: ' + err );
-              });
+              debugger;
+              var action = new action_suggestions();
+              action.run(value);
 
             }
 
