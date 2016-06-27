@@ -74,7 +74,6 @@ app.get('/downloads/covers/:cover', function(req, res){
  /*   ------------ Catalog (CouchDB) Infrastructure ------------- */
  var index = require('./modules/Index');
  app.get('/index/update',function(req,res){
-   debugger;
     index.update();
     res.send(200);
  });
@@ -87,12 +86,11 @@ app.get('/downloads/covers/:cover', function(req, res){
 
  //Insert an archive into the catalog
  app.post('/catalog/insert', function(req, res){
-   debugger;
    catalog.insert(req, res);
  });
 
  /*   ------------ Read a comic ------------- */
- var pages = require('./modules/pages');
+var pages = require('./modules/pages');
 app.get('/cb-ex', function(req,res){
   pages.index(req, res);
 });

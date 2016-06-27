@@ -12,8 +12,6 @@ var Archive = require("./Archive");
 
 exports.index = function(req, res) {
 
-  debugger;
-
     var issue = req.query.issue;
 
     if (!fs.existsSync(issue) ) {

@@ -30,7 +30,6 @@ search_action.prototype.run =function(model){
                 }).appendTo(main_div);
 
                 okay.click(function(){
-                    debugger;
                     var value = input.val();
                     hide();
                     action_okay(value);
@@ -54,9 +53,19 @@ search_action.prototype.run =function(model){
 
             function action_okay(value){
 
-              debugger;
+              var tokens = value.split(' ');
+
+              var series = tokens.filter(function(token){
+                return !S(token).startsWith('#');
+              }).join(' ');
+
+              var number = tokens.filter(function(token){
+                return S(token).startsWith('#');
+              }).join(' ').replace('#', '');
+
+
               var action = new action_suggestions();
-              action.run(value);
+              action.run(series, number);
 
             }
 
