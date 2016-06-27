@@ -6,6 +6,12 @@ $.getJSON('/downloads', function(data) {
     });
 });
 
+/*
+ Update the index...
+ */
+$('#update-catalog-action').click(function(){
+    $.get('/index/update',function(){});
+});
 
 /*
  Cache information for all pending comicss

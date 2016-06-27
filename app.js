@@ -74,6 +74,7 @@ app.get('/downloads/covers/:cover', function(req, res){
  /*   ------------ Catalog (CouchDB) Infrastructure ------------- */
  var index = require('./modules/Index');
  app.get('/index/update',function(req,res){
+   debugger;
     index.update();
     res.send(200);
  });

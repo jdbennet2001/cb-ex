@@ -75,6 +75,8 @@ CouchInstance.prototype.get = function(key) {
  */
 CouchInstance.prototype.exists = function(key){
 
+	var connection = this.connection;
+
 	var promise = new Promise(function(resolve, reject) {
 
 		connection.then(function(connection){
@@ -97,6 +99,8 @@ CouchInstance.prototype.exists = function(key){
  Upload a file to the database
  */
 CouchInstance.prototype.upload = function(key, location ){
+
+	var connection = this.connection;
 
 	var promise = new Promise(function(resolve, reject) {
 

@@ -116,7 +116,8 @@ function update_issues( issues ){
   });
 
   var promise = promise_loop.array( entries, function(entry){
-                  series_cache.insert(entry.index, entry.record);
+                  console.log('Inserting: ' + entry.index );
+                  return issue_cache.insert(entry.index, entry.record);
                 });
 
 	promise.then( function(){
@@ -129,7 +130,7 @@ function update_issues( issues ){
 
 function update_covers( issues ){
 
-  var keys = Object.keys(issue);
+  var keys = Object.keys(issues);
 
   var p = promise_loop.array(keys,function(key){
       return update_cover(key);
@@ -149,7 +150,7 @@ function update_cover( filename ){
 		var key = path.basename(filename);
 
 		//Cover in database?
-		couchDB.exists('covers', key).then(function(body) {
+		covers_cache.exists(key).then(function(body) {
 
 			console.log('Processing cover for : ' + path.basename(filename) + ' ... skipped.');
 			resolve( body );
@@ -167,7 +168,7 @@ function update_cover( filename ){
 				console.log( 'Uploading cover: ' + path.basename(cover) );
 
 				//Upload it..
-				couchDB.upload('covers',key, cover).then(function(body){
+				covers_cache.upload(key, cover).then(function(body){
 					var tmp_directory = path.join( __dirname, '/../public/tmp');
 					fse.emptyDirSync(tmp_directory);
 					resolve(body);
@@ -230,7 +231,7 @@ function update_folders(folders){
 
   //Insert data, sequentially, into the cache
   var promise = promise_loop.array( entries, function(entry){
-                  folder_cache.insert(entry.folder, entry);
+                  return folder_cache.insert(entry.folder, entry);
                 });
 
 	promise.then( function(){

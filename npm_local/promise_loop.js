@@ -17,7 +17,7 @@ function promise_loop(){
  */
 promise_loop.prototype.array = function( items, callback ){
 
-  var promise = array.reduce( function(previous, next ){
+  var promise = items.reduce( function(previous, next ){
     return previous.then(function(result){
       return callback(next);
     });
