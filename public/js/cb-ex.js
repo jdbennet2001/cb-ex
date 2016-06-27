@@ -74,8 +74,8 @@ $('#update-catalog-action').click(function(){
      return;
    }
 
-   var action = new search_action(selected.data('model'));
-   action.run();
+   var action = new search_action();
+   action.run(selected.data('model'));
  });
 
 /*
