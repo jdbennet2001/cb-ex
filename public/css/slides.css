@@ -1,0 +1,52 @@
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    font-size: 14px;
+    font-family: HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, "Lucida Grande", "Meiryo", "Microsoft YaHei", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow-x: auto
+    overflow-y: hidden;
+}
+
+.ui-loader{
+	display:none;
+}
+
+#window-resizer-tooltip{
+	display: none;
+}
+
+#slides {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+}
+
+#slides img{
+    flex: 0 0 100%;
+    align-self: flex-start;
+    width:100%;
+    display: block;
+}
+
+.left{
+    float: left;
+    font-size: 4em;
+    margin-left: 1em;
+}
+
+.right{
+    float:right;
+    font-size: 4em;
+    margin-right: 1em;
+}

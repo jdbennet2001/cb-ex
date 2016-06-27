@@ -90,3 +90,9 @@ app.get('/downloads/covers/:cover', function(req, res){
    debugger;
    catalog.insert(req, res);
  });
+
+ /*   ------------ Read a comic ------------- */
+ var pages = require('./modules/pages');
+app.get('/cb-ex', function(req,res){
+  pages.index(req, res);
+});

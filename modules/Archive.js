@@ -13,25 +13,27 @@ function Archive(filepath){
 	this.issue_name = S(path.basename(filepath)).chompRight(path.extname(filepath)).s;
 }
 
-Archive.prototype.extract = function(){
+Archive.prototype.extract = function(target_dir){
 
 	var file = this.path;
 	var type = this.type();
 
-	fse.emptyDirSync(this.tmp_directory); 
+	var target  = target_dir || this.tmp_directory;
+
+	fse.emptyDirSync(target_dir); 
 
 	var result;
-	console.log( 'Extracting ' + file + ", to " + this.tmp_directory );
+	console.log( 'Extracting ' + file + ", to " + target_dir );
 
 	if( type == 'cbz' ){
-	 	result = child_process.spawnSync( '/usr/bin/unzip', [ '-j', file ], { 'cwd': this.tmp_directory } );
+	 	result = child_process.spawnSync( '/usr/bin/unzip', [ '-j', file ], { 'cwd': target_dir } );
 	}
 	else{
-    	result = child_process.spawnSync( 'unrar', [ 'e', file ], { 'cwd': this.tmp_directory } );
+    	result = child_process.spawnSync( 'unrar', [ 'e', file ], { 'cwd': target_dir } );
 	}
 
 	if ( type === 'cbr' && result.status == 10 ){
-	 	result = child_process.spawnSync( '/usr/bin/unzip', [ '-j', file ], { 'cwd': this.tmp_directory } );
+	 	result = child_process.spawnSync( '/usr/bin/unzip', [ '-j', file ], { 'cwd': target_dir } );
 	}
 
 	if ( result.stderr.toString() ){
@@ -41,7 +43,7 @@ Archive.prototype.extract = function(){
 		console.log( '.. sdtout: ' + result.stdout.toString() );
 	}
 
-	return this.tmp_directory;
+	return target_dir;
 
 };
 
@@ -51,7 +53,7 @@ Archive.prototype.extract = function(){
 Archive.prototype.extractCover = function(){
 
 	//Wipe the temporary directory
-	fse.emptyDirSync(this.tmp_directory); 
+	fse.emptyDirSync(this.tmp_directory);
 
 	var target = path.join(this.project_directory, 'public/covers', this.issue_name + ".jpg");
 
@@ -89,14 +91,14 @@ Archive.prototype.extractCover = function(){
     		console.error( 'Resize failure: ' + err.message );
     	}
 
-	
+
 	}else{
 		//console.log( 'Cover already exists, skip');
 	}
 
 
 	//Add done, clean up
-	fse.emptyDirSync(this.tmp_directory); 
+	fse.emptyDirSync(this.tmp_directory);
 
 	return target;
 
@@ -104,7 +106,7 @@ Archive.prototype.extractCover = function(){
 
 
 
-/* 
+/*
  Return a list of all files in the Archive.
  */
 Archive.prototype.contents = function(){
@@ -121,7 +123,7 @@ Archive.prototype.type = function(){
 
 		if ( extname == '.cbz')
 			return 'cbz';
-		else 
+		else
 			return 'cbr';
 
 };

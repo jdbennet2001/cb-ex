@@ -85,8 +85,6 @@ $.getScript('/js/actions/action-suggestions.js');
 var queue = document.querySelector('.queue');
 queue.addEventListener("selection", function(e) {
 
-  debugger;
-
 	console.info("Event is: ", e);
 	console.info("Model data is: ", e.detail);
 
@@ -94,3 +92,17 @@ queue.addEventListener("selection", function(e) {
   action.run( e.detail.series, e.detail.number, e.detail.year );
 
 });
+
+/*
+ Read comic
+ */
+ $.getScript('/js/actions/action-open.js');
+ $('#read-action').click(function(){
+   var selected = $('.queue .selected');
+   if ( selected.length === 0 ){
+     return;
+   }
+
+   var action = new open_action();
+   action.run(selected.data('model'));
+ });

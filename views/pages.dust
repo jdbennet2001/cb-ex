@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<title>Web Box</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<!--  Third party slideshow tools -->
+<script src="//code.jquery.com/jquery-latest.min.js"></script>
+<script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<script src="/libraries/prefixfree.min.js"></script>
+<script src="/libraries/comic_viewer.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/slides.css">
+
+
+<script type="text/javascript">
+
+
+
+
+</script>
+
+
+</head>
+<body>
+
+  <div id='header'></div>
+
+  <div id="slides">
+
+  	{#files}
+  	<img src='/icons/blank-page.png' data-src="{.}"></img>
+  	{/files}
+
+  </div>
+
+
+</body>
+</html>
