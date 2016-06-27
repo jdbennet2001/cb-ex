@@ -19,13 +19,14 @@ file_action.prototype.run = function(source, target) {
         series: target.volume.id
       };
 
-      return $.post('/catalog/insert', model);
+      $.post('/catalog/insert', model).then(function(){
+        resolve('Success!');
+      }, function(err){
+        reject('Error: ' + err);
+      });
 
-    }).then(function(result) {
-      resolve(result);
-    }, function(err) {
-      reject(err);
-      console.log('Error: ' + err);
+    }, function(err){
+      reject('Series error: ' + err );
     });
 
   });

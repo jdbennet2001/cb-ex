@@ -46,19 +46,19 @@ Catalog.prototype.insert = function(req, res){
   var model = req.body;
 
   //Move file
-  var target =  path.join(model.directory, name);
+  var target =  path.join(target_dir, model.directory, model.name);
 
   mv(model.source, target, function(err) {
       if ( err ){
         return res.stats(500).send(err);
       }
 
-      res.status(200);
+      res.send(200);
 
       //Update various caches, if necessary
-      series_cache.insert(model.series, { index: series, path: model.directory } );
+      series_cache.insert(model.series, { index: model.series, path: model.directory } );
 
-      issues_cache.insert(target, { directory: model.directory, name: model.name, location: target});
+      issue_cache.insert(target, { directory: model.directory, name: model.name, location: target});
 
       //Extract cover into catalog
       index.indexCover(target);
