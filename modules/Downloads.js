@@ -31,7 +31,14 @@ var issues = [];
  }
 
 Downloads.prototype.issues = function(){
-    return issues;
+
+    debugger;
+
+    var comics = issues.filter(function(issue){
+        return fs.existsSync( issue.path );
+    });
+
+    return comics;
 };
 
 /*

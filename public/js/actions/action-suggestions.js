@@ -5,19 +5,19 @@ function action_suggestions(){
 action_suggestions.prototype.run = function(series, number, year){
 
   //Clear the suggestion area
-   $('.candidates').empty();
+  $('.candidates').empty();
 
-   $('body').spinner('Loading...');
+  $('body').spinner('Loading...');
 
-   //Display new suggestions
-   var p = get_suggestions( series, number, year);
+  //Display new suggestions
+  var p = get_suggestions( series, number, year);
 
-   p.then(function(result){
-     $('.jqSpinnerDialog').remove();
-   },function(err){
-     $('.jqSpinnerDialog').remove();
-     console.log('Error retrieving data: ' + err );
-   });
+  p.then(function(result){
+    $('.jqSpinnerDialog').remove();
+  },function(err){
+    $('.jqSpinnerDialog').remove();
+    console.log('Error retrieving data: ' + err );
+  });
 
 };
 

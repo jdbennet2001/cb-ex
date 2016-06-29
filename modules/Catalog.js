@@ -45,13 +45,21 @@ Catalog.prototype.insert = function(req, res){
 
   var model = req.body;
 
+  debugger;
+
   //Move file
   var target =  path.join(target_dir, model.directory, model.name);
 
-  mv(model.source, target, function(err) {
+  console.log( 'Copying ' + model.name + ' to ' + target );
+
+  mv(model.source, target, {mkdirp: true},  function(err) {
       if ( err ){
-        return res.stats(500).send(err);
+        console.log('Error: ' + err + ' for: ' + model.source + " to " + target );
+        return res.status(500).send(err);
+        proceess.exit(-1);
       }
+
+      console.log('Copy complete..');
 
       res.send(200);
 

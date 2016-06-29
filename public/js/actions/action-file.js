@@ -6,6 +6,8 @@ file_action.prototype.run = function(source, target) {
 
   debugger;
 
+  $('body').spinner('Filing...');
+
   var name = getName(source, target);
 
   var p = new Promise(function(resolve, reject) {
@@ -20,12 +22,16 @@ file_action.prototype.run = function(source, target) {
       };
 
       $.post('/catalog/insert', model).then(function(){
+        $('.jqSpinnerDialog').remove();
+        $('.candidates').empty();
         resolve('Success!');
       }, function(err){
+        $('.jqSpinnerDialog').remove();
         reject('Error: ' + err);
       });
 
     }, function(err){
+      $('.jqSpinnerDialog').remove();
       reject('Series error: ' + err );
     });
 
@@ -46,7 +52,7 @@ function getName(source_model, target_model) {
     name += ' (' + target_model.cover_date + ')';
   }
   if (target_model.name) {
-    name += ' - ' + target.name;
+    name += ' - ' + target_model.name;
   }
   var dot = source_model.path.lastIndexOf('.');
   var extension = source_model.path.substring(dot);
