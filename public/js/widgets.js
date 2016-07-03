@@ -75,7 +75,9 @@
 
             function getNumber(name){
 
-              var text = S(name).replaceAll('_', ' ').replaceAll('(', ' ').replaceAll(')', ' ').replaceAll('#', ' ').s;
+              var title = name.replace(/ *\([^)]*\) */g, "");
+
+              var text = S(title).replaceAll('_', ' ').replaceAll('(', ' ').replaceAll(')', ' ').replaceAll('#', ' ').s;
 
               var numbers = text.split(' ').filter(function(token){
 

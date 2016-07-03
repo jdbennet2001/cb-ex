@@ -32,10 +32,22 @@ var issues = [];
 
 Downloads.prototype.issues = function(){
 
-    debugger;
-
     var comics = issues.filter(function(issue){
         return fs.existsSync( issue.path );
+    });
+
+    var twenty_mb = 1024 * 1024 * 20;
+    comics = comics.filter(function(comic){
+      var stats = fs.statSync(comic.path);
+      var fileSizeInBytes = stats.size;
+      return fileSizeInBytes >= twenty_mb;
+    });
+
+    var seventy_five_mb = 1024 * 1024 * 75;
+    comics = comics.filter(function(comic){
+      var stats = fs.statSync(comic.path);
+      var fileSizeInBytes = stats.size;
+      return fileSizeInBytes <= twenty_mb;
     });
 
     return comics;

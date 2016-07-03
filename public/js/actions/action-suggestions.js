@@ -110,6 +110,12 @@ function get_suggestions(series, number, year) {
         //Empty matches, ignore that filter..
         data = data.length ? data : candidates;
 
+
+        //Filter by series
+        // var series_data = data.filter(function(entry){
+        //
+        // });
+
         //Save the suggestions to the internal model
         data.forEach(function(entry, index) {
             $('.candidates').suggestion( entry );
