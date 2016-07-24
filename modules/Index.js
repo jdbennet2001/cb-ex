@@ -97,7 +97,7 @@ function getArchiveSummary( filename, stat ){
       size: stat.size,
       name: path.basename(filename),
       location : S(filename).chompLeft(target_dir).s,
-      directory: S(filename).chompLeft(target_dir).chompRight(path.basename(filename)).s
+      directory: S(filename).chompLeft(target_dir).chompRight(path.basename(filename)).chompRight('/').s
     };
 
     return record;
@@ -110,7 +110,7 @@ function update_issues( issues ){
   var entries = keys.map(function(key){
       var entry = {
         record: getArchiveSummary( key, issues[key] ),
-        index: key
+        index: S(key).chompLeft(target_dir).s
       };
       return entry;
   });
@@ -249,6 +249,8 @@ Index.prototype.update = function(){
 
 	var emitter = walk(target_dir);
 
+  console.log('.. indexing: ' + target_dir );
+
 	var archives = {};
 	var series = {};
 	var folders = [];
@@ -272,7 +274,7 @@ Index.prototype.update = function(){
 	});
 
 	emitter.on('end', function() {
-  		console.log( 'Done!');
+  		console.log( 'Done scanning!!');
   		console.log( 'Archives: ' + Object.keys(archives).length + ", series: " + Object.keys(series).length + ", folders: " + folders.length  );
 
 

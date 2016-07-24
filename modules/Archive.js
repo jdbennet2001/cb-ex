@@ -20,12 +20,15 @@ Archive.prototype.extract = function(target_dir){
 
 	var target  = target_dir || this.tmp_directory;
 
-	fse.emptyDirSync(target_dir); 
+	fse.emptyDirSync(target_dir);
 
 	var result;
-	console.log( 'Extracting ' + file + ", to " + target_dir );
+	console.log( 'Extracting ' + file + ", to " + target_dir +', with extension ' + type );
 
-	if( type == 'cbz' ){
+	if ( type == 'cbt'){
+	 	result = child_process.spawnSync( '/usr/bin/tar', [ '-xvf', file ], { 'cwd': target_dir } );
+	}
+	else if( type == 'cbz' ){
 	 	result = child_process.spawnSync( '/usr/bin/unzip', [ '-j', file ], { 'cwd': target_dir } );
 	}
 	else{
@@ -68,14 +71,14 @@ Archive.prototype.extractCover = function(){
 		//Filter out non-jpg files.
 		files = files.filter( function( file ){
 			var extname = path.extname(file).toLowerCase();
-			if ( extname != '.jpg' && extname != '.png' && extname != '.jpeg' && extname != '.gif')
+			if ( extname != '.jpg' && extname != '.png' && extname != '.jpeg' && extname != '.gif' && extname != '.webp')
 				return false;
 			else
 				return true;
 
 		});
 
-		if ( files.length == 0 ){
+		if ( files.length === 0 ){
 			return;
 		}
 
@@ -120,11 +123,9 @@ Archive.prototype.contents = function(){
 Archive.prototype.type = function(){
 
 		var extname = path.extname(this.path).toLowerCase();
+		extname = extname.replace('.', '' );
 
-		if ( extname == '.cbz')
-			return 'cbz';
-		else
-			return 'cbr';
+		return extname;
 
 };
 

@@ -29,12 +29,15 @@ ComicVine.prototype.getSuggestions = function(req, res) {
 
     var query = req.params.query;
 
+    debugger;
+
     cache.get(query).then(function(data) {
         console.log('Returning query ' + query + ' from cache.');
         res.send(data.results);
 
     }, function(err) {
         console.log('Empty cache for query ' + query + ', call comic vine.');
+        debugger;
         getSuggestionsFromCV(query).then(function(results) {
             cache.insert(query, {results: results});
             res.send(results);

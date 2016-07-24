@@ -36,19 +36,19 @@ Downloads.prototype.issues = function(){
         return fs.existsSync( issue.path );
     });
 
-    var twenty_mb = 1024 * 1024 * 20;
+    var min_mb = 1024 * 1024 * 10;
     comics = comics.filter(function(comic){
       var stats = fs.statSync(comic.path);
       var fileSizeInBytes = stats.size;
-      return fileSizeInBytes >= twenty_mb;
+      return fileSizeInBytes >= min_mb;
     });
 
-    var seventy_five_mb = 1024 * 1024 * 75;
-    comics = comics.filter(function(comic){
-      var stats = fs.statSync(comic.path);
-      var fileSizeInBytes = stats.size;
-      return fileSizeInBytes <= twenty_mb;
-    });
+    // var max_mb = 1024 * 1024 * 250;
+    // comics = comics.filter(function(comic){
+    //   var stats = fs.statSync(comic.path);
+    //   var fileSizeInBytes = stats.size;
+    //   return fileSizeInBytes <= max_mb;
+    // });
 
     return comics;
 };
@@ -79,6 +79,7 @@ Downloads.prototype.cover = function(req, res){
    //Scan the directory to find all issues waiting to be filed.
    console.log( 'Scanning '+ source_dir + ' for queued issues.');
    ls(source_dir, function (err, tree) {
+     debugger;
       var comics = tree.filter(function(leaf){
         var ext = path.extname(leaf);
         return !!ext.match(/^.cb*/i);

@@ -27,6 +27,7 @@ exports.index = function(req, res) {
     var archive = new Archive(issue);
 
     archive.extract(tmp_directory);
+    debugger;
     resize_direcory(tmp_directory);
 
     console.log('Rendering directory.');
@@ -41,10 +42,12 @@ function resize_direcory(directory) {
 
     //Get the list
     var files = fs.readdirSync(directory);
+    console.log( files.length + ' files to be processed.');
 
     //Filter out non-jpg files.
     files = files.filter(function(file) {
         var extname = path.extname(file).toLowerCase();
+        console.log( 'Checking ' + file + 'with extention ' + extname );
         if (extname != '.jpg' && extname != '.png' && extname != '.jpeg' && extname != '.webp')
             return false;
         else
