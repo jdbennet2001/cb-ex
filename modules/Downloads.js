@@ -79,7 +79,6 @@ Downloads.prototype.cover = function(req, res){
    //Scan the directory to find all issues waiting to be filed.
    console.log( 'Scanning '+ source_dir + ' for queued issues.');
    ls(source_dir, function (err, tree) {
-     debugger;
       var comics = tree.filter(function(leaf){
         var ext = path.extname(leaf);
         return !!ext.match(/^.cb*/i);
