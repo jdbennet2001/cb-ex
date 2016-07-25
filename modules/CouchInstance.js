@@ -19,8 +19,6 @@ function CouchInstance(database_name){
 
 CouchInstance.prototype.addView = function(design_doc_name, view_name, map_function) {
 
-	debugger;
-
 	var connection = this.connection;
 
 	var promise = new Promise(function(resolve, reject) {

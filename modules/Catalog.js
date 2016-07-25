@@ -27,8 +27,15 @@ var covers_cache = new CouchDB('covers');
 
 function Catalog(){
 
+  /*
+   Group folders / issues by directory for easier browsing
+   */
   folder_cache.addView('_design/browse', 'directory_contents', function(doc) {
       emit(doc.parent, doc.folder);
+  });
+
+  issue_cache.addView('_design/browse', 'directory_contents', function(doc){
+      emit(doc.directory, doc);
   });
 
 }
