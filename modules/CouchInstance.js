@@ -41,8 +41,6 @@ CouchInstance.prototype.addView = function(design_doc_name, view_name, map_funct
 
 CouchInstance.prototype.keys = function() {
 
-	debugger;
-
 	var doc_url = url + '/' +  this.database_name + '/_all_docs';
 
   var p = new Promise(function(resolve, reject) {
@@ -65,6 +63,36 @@ CouchInstance.prototype.keys = function() {
   });
 
   return p;
+
+};
+
+
+/*
+ Query a view to find documents with a specific key:
+ @param: database name
+ @param: design document name (do not include the '_design/' prefix)
+ @param: view name
+ @param: key used when filtering the results
+ @return: An array of: { _id: .., key: ..., value:...} objects
+ */
+CouchInstance.prototype.queryView = function(design_doc_name, view_name, params ){
+
+	var connection = this.connection;
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connection.then(function(connection) {
+			connection.view(design_doc_name, view_name, { keys: [params]}, function(err, body) {
+				if ( err ){
+					return reject(err);
+				}
+ 				resolve(body.rows);
+			});
+
+		});
+	});
+
+	return promise;
 
 };
 

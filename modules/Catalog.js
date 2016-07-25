@@ -59,6 +59,28 @@ Catalog.prototype.series = function(req, res){
 
 };
 
+/*
+ Return all entries in a given directory
+ */
+Catalog.prototype.directory_contents = function(req, res){
+
+  var results = {};
+
+  var directory = S(decodeURIComponent(req.url)).chompLeft('/catalog/directory').s;
+
+  debugger;
+  folder_cache.queryView('browse', 'directory_contents', directory).then(function(folders){
+    results.folders = folders;
+    return issue_cache.queryView('browse', 'directory_contents', directory);
+  }).then(function(issues){
+    results.issues = issues;
+    res.json(results);
+  }, function(err){
+    return res.sendStatus(500);
+  });
+
+};
+
 Catalog.prototype.insert = function(req, res){
 
   var model = req.body;

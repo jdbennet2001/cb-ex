@@ -90,6 +90,10 @@ app.get('/downloads/covers/:cover', function(req, res){
    catalog.insert(req, res);
  });
 
+ app.get('/catalog/directory/*', function(req, res){
+   catalog.directory_contents(req, res);
+ });
+
  /*   ------------ Read a comic ------------- */
 var pages = require('./modules/pages');
 app.get('/cb-ex', function(req,res){
