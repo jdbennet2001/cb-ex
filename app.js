@@ -74,6 +74,7 @@ app.get('/downloads/covers/:cover', function(req, res){
  /*   ------------ Catalog (CouchDB) Infrastructure ------------- */
  var index = require('./modules/Index');
  app.get('/index/update',function(req,res){
+    console.log( 'Updating index...');
     index.update();
     res.send(200);
  });
@@ -86,7 +87,6 @@ app.get('/downloads/covers/:cover', function(req, res){
 
  //Insert an archive into the catalog
  app.post('/catalog/insert', function(req, res){
-   debugger;
    catalog.insert(req, res);
  });
 
