@@ -38,6 +38,13 @@ function Catalog(){
       emit(doc.directory, doc);
   });
 
+  /*
+   List of all documents
+   */
+   issue_cache.keys().then(function(keys){
+     console.log( 'Catalog open, ' + keys.length + ', entries.');
+   });
+
 }
 
 Catalog.prototype.series = function(req, res){

@@ -39,6 +39,35 @@ CouchInstance.prototype.addView = function(design_doc_name, view_name, map_funct
 	return promise;
 };
 
+CouchInstance.prototype.keys = function() {
+
+	debugger;
+
+	var doc_url = url + '/' +  this.database_name + '/_all_docs';
+
+  var p = new Promise(function(resolve, reject) {
+
+    request(doc_url, function(error, response, body) {
+
+			if ( error || response.statusCode !== 200){
+				return reject(error);
+			}
+
+			var rows =  JSON.parse(body).rows;
+			var keys = rows.map(function(row){
+					return row.id;
+			});
+
+      resolve(keys);
+      console.log(keys.length + ' keys found.');
+		});
+
+  });
+
+  return p;
+
+};
+
 
 /*
  Insert a record into the specified database. Updates an existing record if necessary.
