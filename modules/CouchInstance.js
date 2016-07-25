@@ -203,6 +203,40 @@ CouchInstance.prototype.upload = function(key, location ){
 };
 
 /*
+ Grab and attachment from the database
+ */
+ /*
+ Upload a file to the database
+ */
+CouchInstance.prototype.getAttachment = function(key, location ){
+
+	var connection = this.connection;
+
+	debugger;
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connection.then(function(connection){
+
+			connection.attachment.get(key, key, function(err, body){
+				debugger;
+				if ( err ){
+					return reject(err);
+				}
+				resolve( body );
+
+			});
+
+		});
+
+	});
+
+	return promise;
+
+};
+
+
+/*
  Generate a database connection (create the database if necessary)
  Returns a promise, with the database connection.
  */

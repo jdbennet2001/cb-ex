@@ -68,7 +68,6 @@ Catalog.prototype.directory_contents = function(req, res){
 
   var directory = S(decodeURIComponent(req.url)).chompLeft('/catalog/directory').s;
 
-  debugger;
   folder_cache.queryView('browse', 'directory_contents', directory).then(function(folders){
     results.folders = folders;
     return issue_cache.queryView('browse', 'directory_contents', directory);
@@ -77,6 +76,18 @@ Catalog.prototype.directory_contents = function(req, res){
     res.json(results);
   }, function(err){
     return res.sendStatus(500);
+  });
+
+};
+
+Catalog.prototype.cover = function(req, res){
+
+  covers_cache.getAttachment('007 Strange Tales #118.cbr').then(function(data){
+    debugger;
+    res.contentType('image/jpeg');
+    res.end(data, 'binary');
+  }, function(err){
+    res.sendFile( process.cwd() + '/public/icons/balloon.png');
   });
 
 };

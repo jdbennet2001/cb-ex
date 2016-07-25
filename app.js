@@ -94,6 +94,11 @@ app.get('/downloads/covers/:cover', function(req, res){
    catalog.directory_contents(req, res);
  });
 
+ app.get('/catalog/cover/*', function(req, res){
+   debugger;
+   catalog.cover(req, res);
+ });
+
  /*   ------------ Read a comic ------------- */
 var pages = require('./modules/pages');
 app.get('/cb-ex', function(req,res){
