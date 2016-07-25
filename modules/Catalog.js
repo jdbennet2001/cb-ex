@@ -27,6 +27,10 @@ var covers_cache = new CouchDB('covers');
 
 function Catalog(){
 
+  folder_cache.addView('_design/browse', 'directory_contents', function(doc) {
+      emit(doc.parent, doc.folder);
+  });
+
 }
 
 Catalog.prototype.series = function(req, res){
@@ -45,8 +49,6 @@ Catalog.prototype.insert = function(req, res){
 
   var model = req.body;
 
-  debugger;
-
   //Move file
   var target =  path.join(target_dir, model.directory, model.name);
 
@@ -56,7 +58,6 @@ Catalog.prototype.insert = function(req, res){
       if ( err ){
         console.log('Error: ' + err + ' for: ' + model.source + " to " + target );
         return res.status(500).send(err);
-        proceess.exit(-1);
       }
 
       console.log('Copy complete..');

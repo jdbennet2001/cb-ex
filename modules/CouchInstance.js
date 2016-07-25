@@ -17,7 +17,29 @@ function CouchInstance(database_name){
 
 }
 
+CouchInstance.prototype.addView = function(design_doc_name, view_name, map_function) {
 
+	debugger;
+
+	var connection = this.connection;
+
+	var promise = new Promise(function(resolve, reject) {
+
+		connection.then(function(connection) {
+
+			var vn = view_name;
+			var view = { "views": {} };
+			view.views[view_name] = { 'map' : map_function };
+
+			connection.insert( view, design_doc_name, function(error, response) {
+									console.log("View: " + view_name + ", added.");
+									resolve(response);
+								});
+			});
+	});
+
+	return promise;
+};
 
 
 /*
