@@ -25,6 +25,8 @@ var folder_cache =  new CouchDB('folders');
 var series_cache = new CouchDB('series');
 var covers_cache = new CouchDB('covers');
 
+var issues = [];
+
 function Catalog(){
 
   /*
@@ -42,7 +44,19 @@ function Catalog(){
    List of all documents
    */
    issue_cache.keys().then(function(keys){
+
      console.log( 'Catalog open, ' + keys.length + ', entries.');
+     var promise = keys.reduce( function(previous, next ){
+       return previous.then(function(result, index, array){
+         issues.push(result);
+         return issue_cache.get(next);
+       });
+     }, Promise.resolve() );
+
+     promise.then(function(){
+        console.log( 'Retrieved ' + issues.length + ' issues from database');
+     });
+
    });
 
 }
@@ -59,6 +73,20 @@ Catalog.prototype.series = function(req, res){
 
 };
 
+Catalog.prototype.random = function(req, res){
+
+  var results = { folders: [], issues: [] };
+
+  for ( var i = 0; i < 25; i++ ){
+    var item = issues[Math.floor(Math.random()*issues.length)];
+    var record = JSON.parse(JSON.stringify(item));
+    record.location = target_dir + record.location;
+    results.issues.push( {value: record});
+  }
+
+  res.json(results);
+};
+
 /*
  Return all entries in a given directory
  */
@@ -72,10 +100,8 @@ Catalog.prototype.directory_contents = function(req, res){
     results.folders = folders;
     return issue_cache.queryView('browse', 'directory_contents', directory);
   }).then(function(issues){
-    debugger;
     issues.forEach(function(issue){
         //Comic viewer uses absolute paths
-
         issue.value.location = target_dir + issue.value.location;
     });
     results.issues = issues;

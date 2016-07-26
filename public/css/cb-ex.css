@@ -156,7 +156,8 @@ body {
 }
 
 .comic img {
-    height: 150px;
+    max-height: 150px;
+    max-width: 125px;
     margin: 10px 0;
     display:box;
 

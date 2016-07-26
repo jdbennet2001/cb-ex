@@ -94,6 +94,11 @@ app.get('/downloads/covers/:cover', function(req, res){
    catalog.directory_contents(req, res);
  });
 
+ app.get('/catalog/directory/random', function(req, res){
+   debugger;
+   catalog.random(req, res);
+ });
+
  app.get('/catalog/directory/*', function(req, res){
    catalog.directory_contents(req, res);
  });

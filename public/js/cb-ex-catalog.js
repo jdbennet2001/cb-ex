@@ -16,6 +16,11 @@ $(document).ready(function(){
       window.location.reload();
   };
 
+  $('#random-action').click(function(event){
+      window.location.hash = '#/random';
+      event.preventDefault();
+  });
+
 });
 
 
