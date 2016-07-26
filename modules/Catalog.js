@@ -66,12 +66,18 @@ Catalog.prototype.directory_contents = function(req, res){
 
   var results = {};
 
-  var directory = S(decodeURIComponent(req.url)).chompLeft('/catalog/directory').s;
+  var directory = S(decodeURIComponent(req.url)).chompLeft('/catalog/directory').s || "";
 
   folder_cache.queryView('browse', 'directory_contents', directory).then(function(folders){
     results.folders = folders;
     return issue_cache.queryView('browse', 'directory_contents', directory);
   }).then(function(issues){
+    debugger;
+    issues.forEach(function(issue){
+        //Comic viewer uses absolute paths
+
+        issue.value.location = target_dir + issue.value.location;
+    });
     results.issues = issues;
     res.json(results);
   }, function(err){
@@ -82,8 +88,11 @@ Catalog.prototype.directory_contents = function(req, res){
 
 Catalog.prototype.cover = function(req, res){
 
-  covers_cache.getAttachment('007 Strange Tales #118.cbr').then(function(data){
-    debugger;
+  debugger;
+  var name = decodeURIComponent(S(req.url).chompLeft('/catalog/cover/').s);
+
+
+  covers_cache.getAttachment(name).then(function(data){
     res.contentType('image/jpeg');
     res.end(data, 'binary');
   }, function(err){

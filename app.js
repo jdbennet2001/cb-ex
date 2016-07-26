@@ -90,12 +90,15 @@ app.get('/downloads/covers/:cover', function(req, res){
    catalog.insert(req, res);
  });
 
+ app.get('/catalog/directory', function(req, res){
+   catalog.directory_contents(req, res);
+ });
+
  app.get('/catalog/directory/*', function(req, res){
    catalog.directory_contents(req, res);
  });
 
  app.get('/catalog/cover/*', function(req, res){
-   debugger;
    catalog.cover(req, res);
  });
 
