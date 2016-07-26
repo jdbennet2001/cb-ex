@@ -29,6 +29,7 @@ build/Release
 #Temporary image directories
 public/covers
 public/tmp
+public/viewer
 
 # Dependency directory
 node_modules

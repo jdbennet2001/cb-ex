@@ -69,8 +69,7 @@ body {
     height: 50px;
     display:block;
     cursor: pointer;
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin: auto;
 }
 
 
