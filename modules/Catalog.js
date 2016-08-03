@@ -43,18 +43,21 @@ function Catalog(){
   /*
    List of all documents
    */
+   debugger;
    issue_cache.keys().then(function(keys){
 
-     console.log( 'Catalog open, ' + keys.length + ', entries.');
-     var promise = keys.reduce( function(previous, next ){
-       return previous.then(function(result, index, array){
-         issues.push(result);
+     console.log( 'Catalog open, ' +  keys.length + ', entries.');
+     var promise = keys.reduce( function(previous, next, index, array ){
+       return previous.then(function(result){
+         if ( result ){
+           issues.push(result);
+         }
          return issue_cache.get(next);
        });
      }, Promise.resolve() );
 
      promise.then(function(){
-        console.log( 'Retrieved ' + issues.length + ' issues from database');
+        console.log( 'Retrieved all data from database. Data cache good to go.');
      });
 
    });

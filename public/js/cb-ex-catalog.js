@@ -21,6 +21,17 @@ $(document).ready(function(){
       event.preventDefault();
   });
 
+  $('#open-folder-action').click(function(event){
+      var selected = $('.selected');
+      if ( selected.length  !== 1){
+        return;
+      }
+      debugger;
+
+      event.preventDefault();
+      window.location.hash = '#' + selected.data().model.directory;
+  });
+
 });
 
 
@@ -81,6 +92,11 @@ $(document).ready(function(){
                     "class": 'comic'
                 }).appendTo('.candidates');
 
+                comic_div.click(function(event){
+                    $(this).addClass('selected');
+                    event.stopPropagation();
+                });
+
                 var cover = $('<img />', {
                     src: '/catalog/cover/' + encodeURIComponent(data.name),
                 }).appendTo(comic_div);
@@ -128,7 +144,17 @@ $(document).ready(function(){
             data.description = name.substr(dash+1)|| 'n/a';
 
             data.date = S(data.name).between('(', ')').s || '--';
+            if ( !moment(data.date, "YYYY-MM-DD", true).isValid() ){
+              data.date  = '--'
+            }
             data.number = S(data.name).between(' #', ' ').s || '--';
+            if ( !S(data.number).isNumeric() ){
+              data.number = '--';
+            }
+
+            if ( data.number == '--' && data.date == '--'){
+              data.series = name;
+            }
 
             var div = display_cover(data);
 

@@ -91,6 +91,7 @@ app.get('/downloads/covers/:cover', function(req, res){
  });
 
  app.get('/catalog/directory', function(req, res){
+   debugger;
    catalog.directory_contents(req, res);
  });
 
@@ -100,6 +101,7 @@ app.get('/downloads/covers/:cover', function(req, res){
  });
 
  app.get('/catalog/directory/*', function(req, res){
+   debugger;
    catalog.directory_contents(req, res);
  });
 
