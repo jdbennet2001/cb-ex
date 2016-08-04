@@ -207,6 +207,26 @@ body {
     text-align: center;
 }
 
+input.search {
+    float: right;
+    display: block;
+    line-height: 50px;
+    margin-right: 10px;
+    font-style: italic;
+    margin-top: 12px;
+    width: 200px;
+}
+
+img#search-action{
+  float: right;
+  height: 25px;
+  margin-top: 10px;
+  margin-right: 10px;
+  border: 1px solid white;
+  padding: 3px;
+  border-radius: 5px;
+}
+
 /* - status Area -- */
 .status {
     float: right;

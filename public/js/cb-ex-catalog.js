@@ -21,13 +21,17 @@ $(document).ready(function(){
       event.preventDefault();
   });
 
+  $('#search-action').click(function(event){
+    debugger;
+    window.location.hash = '/search/' + $('.search').val();
+    event.preventDefault();
+  });
+
   $('#open-folder-action').click(function(event){
       var selected = $('.selected');
       if ( selected.length  !== 1){
         return;
       }
-      debugger;
-
       event.preventDefault();
       window.location.hash = '#' + selected.data().model.directory;
   });

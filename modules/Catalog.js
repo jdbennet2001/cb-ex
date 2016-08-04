@@ -42,12 +42,16 @@ function Catalog(){
   });
 
   folder_cache.contents().then(function(contents){
-      folders = contents;
+      folders = contents.filter(function(folder){
+        return !!folder.name;
+      });
       console.log( folders.length + ', folders cached.');
   });
 
   issue_cache.contents().then(function(contents){
-      issues = contents;
+      issues = contents.filter(function(issue){
+          return !!issue.name;
+      });
       console.log( issues.length + ', issues cached.');
   });
 
@@ -65,14 +69,35 @@ Catalog.prototype.series = function(req, res){
 
 };
 
+Catalog.prototype.search = function(req, res ){
+
+
+  var query = req.params.query.toLowerCase();
+  var tokens = query.split(' ');
+
+  var results = { issues: [], folders: [] };
+
+  results.issues = issues.filter( function(issue){
+    var match = tokens.every(function(token){
+      return S( issue.name.toLowerCase() ).contains(token);
+    });
+    return match;
+  });
+
+  //Map data..
+  results.issues = results.issues.map(function(issue){
+      return { value: issue};
+  });
+
+  res.json(results);
+};
+
 /*
  Walk existing titles to see if a new folder should be inserted into an existing title.
  */
 Catalog.prototype.folder_location = function(req, res){
 
   var series = req.query.filter;
-
-  debugger;
 
   var title = folders.find(function(folder){
       return S(series).contains(folder.name);

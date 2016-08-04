@@ -98,6 +98,10 @@ app.get('/downloads/covers/:cover', function(req, res){
    catalog.random(req, res);
  });
 
+ app.get('/catalog/directory/search/:query', function(req, res){
+    catalog.search(req,res);
+ });
+
  app.get('/catalog/directory/*', function(req, res){
    catalog.directory_contents(req, res);
  });
@@ -107,7 +111,6 @@ app.get('/downloads/covers/:cover', function(req, res){
  });
 
  app.get('/catalog/title', function(req, res){
-   debugger;
    catalog.folder_location(req, res);
  });
 
