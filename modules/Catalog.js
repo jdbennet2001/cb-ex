@@ -65,6 +65,28 @@ Catalog.prototype.series = function(req, res){
 
 };
 
+/*
+ Walk existing titles to see if a new folder should be inserted into an existing title.
+ */
+Catalog.prototype.folder_location = function(req, res){
+
+  var series = req.query.filter;
+
+  debugger;
+
+  var title = folders.find(function(folder){
+      return S(series).contains(folder.name);
+  });
+
+  if ( title ){
+    res.json(title);
+  }else{
+    res.send(404);
+  }
+
+
+};
+
 Catalog.prototype.random = function(req, res){
 
   var results = { folders: [], issues: [] };
