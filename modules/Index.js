@@ -223,7 +223,8 @@ function update_folders(folders){
 
       var entry = {
         folder : S(folder).chompLeft(target_dir).s,
-        parent : S(path.dirname(folder)).chompLeft(target_dir).s
+        parent : S(path.dirname(folder)).chompLeft(target_dir).s,
+        name: path.basename(filename)
       };
 
       return entry;
