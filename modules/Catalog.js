@@ -26,6 +26,7 @@ var series_cache = new CouchDB('series');
 var covers_cache = new CouchDB('covers');
 
 var issues = [];
+var folders = [];
 
 function Catalog(){
 
@@ -40,27 +41,15 @@ function Catalog(){
       emit(doc.directory, doc);
   });
 
-  /*
-   List of all documents
-   */
-   debugger;
-   issue_cache.keys().then(function(keys){
+  folder_cache.contents().then(function(contents){
+      folders = contents;
+      console.log( folders.length + ', folders cached.');
+  });
 
-     console.log( 'Catalog open, ' +  keys.length + ', entries.');
-     var promise = keys.reduce( function(previous, next, index, array ){
-       return previous.then(function(result){
-         if ( result ){
-           issues.push(result);
-         }
-         return issue_cache.get(next);
-       });
-     }, Promise.resolve() );
-
-     promise.then(function(){
-        console.log( 'Retrieved all data from database. Data cache good to go.');
-     });
-
-   });
+  issue_cache.contents().then(function(contents){
+      issues = contents;
+      console.log( issues.length + ', issues cached.');
+  });
 
 }
 

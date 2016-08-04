@@ -174,7 +174,6 @@ function update_cover( filename ){
 					resolve(body);
 
 				},function(err){
-					debugger;
 					resolve(err);
 				});
 
@@ -224,7 +223,7 @@ function update_folders(folders){
       var entry = {
         folder : S(folder).chompLeft(target_dir).s,
         parent : S(path.dirname(folder)).chompLeft(target_dir).s,
-        name: path.basename(filename)
+        name: path.basename(folder)
       };
 
       return entry;
@@ -232,6 +231,7 @@ function update_folders(folders){
 
   //Insert data, sequentially, into the cache
   var promise = promise_loop.array( entries, function(entry){
+                  console.log( 'Adding folder: ' + entry.folder);
                   return folder_cache.insert(entry.folder, entry);
                 });
 
@@ -277,7 +277,6 @@ Index.prototype.update = function(){
 	emitter.on('end', function() {
   		console.log( 'Done scanning!!');
   		console.log( 'Archives: ' + Object.keys(archives).length + ", series: " + Object.keys(series).length + ", folders: " + folders.length  );
-
 
   		update_issues( archives ).then(function(){
   			return update_series(series);

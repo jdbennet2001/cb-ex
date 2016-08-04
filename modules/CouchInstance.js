@@ -1,4 +1,4 @@
-var request 	= require('request');
+ request 	= require('request');
 var nconf 		= require('nconf');
 var Promise 	= require('promise');
 var util 			= require('util');
@@ -58,6 +58,35 @@ CouchInstance.prototype.keys = function() {
 
       resolve(keys);
       console.log(keys.length + ' keys found.');
+		});
+
+  });
+
+  return p;
+
+};
+
+
+CouchInstance.prototype.contents = function() {
+
+	var db_name = this.database_name;
+	var doc_url = url + '/' +  this.database_name + '/_all_docs?include_docs=true';
+
+  var p = new Promise(function(resolve, reject) {
+
+    request(doc_url, function(error, response, body) {
+
+			if ( error || response.statusCode !== 200){
+				return reject(error);
+			}
+
+			var rows =  JSON.parse(body).rows;
+			rows = rows.map(function(row){
+				return row.doc;
+			});
+
+      resolve(rows);
+      console.log('Contents for db: ' + db_name + ', ' + rows.length + ' rows found.');
 		});
 
   });
@@ -212,14 +241,12 @@ CouchInstance.prototype.getAttachment = function(key, location ){
 
 	var connection = this.connection;
 
-	debugger;
 
 	var promise = new Promise(function(resolve, reject) {
 
 		connection.then(function(connection){
 
 			connection.attachment.get(key, key, function(err, body){
-				debugger;
 				if ( err ){
 					return reject(err);
 				}
