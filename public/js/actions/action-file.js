@@ -76,6 +76,8 @@ function getSeriesLocation(series) {
 
     }).fail(function(err) {
 
+
+
       //Not in cache, check ComicVine
       $.getJSON('/comicvine/series/' + series, function(data) {
 
@@ -84,8 +86,20 @@ function getSeriesLocation(series) {
           publisher = 'Other';
         }
 
-        var directory = '/' + publisher + '/' + data.name + ' ' + data.start_year + ' (' + series + ')';
-        resolve(directory);
+        debugger;
+
+        //Check if the parent directory should be an existing title (or simply default to a publisher)
+        $.getJSON('/catalog/title?filter=' + data.name, function(title){
+          var directory = title.folder + '/' + data.name + ' ' + data.start_year + ' (' + series + ')';
+          resolve(directory);
+
+        }).fail(function(err){
+
+          var directory = '/' + publisher + '/' + data.name + ' ' + data.start_year + ' (' + series + ')';
+          resolve(directory);
+
+        });
+
 
       }).fail(function(err) {
         reject(err);
