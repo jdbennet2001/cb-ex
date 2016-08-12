@@ -26,6 +26,21 @@ $(document).ready(function(){
     event.preventDefault();
   });
 
+  $('#search-catalog-action').click(function(event){
+    window.location.hash = '/search/' + $('.search').val();
+    event.preventDefault();
+  });
+
+$('.search').keyup(function(event){
+    if(event.keyCode != 13){
+      return;
+    }
+
+    window.location.hash = '/search/' + $('.search').val();
+    event.preventDefault();
+
+});
+
   $('#open-folder-action').click(function(event){
       var selected = $('.selected');
       if ( selected.length  !== 1){
