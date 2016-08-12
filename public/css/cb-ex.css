@@ -210,7 +210,6 @@ body {
 input.search {
     float: right;
     display: block;
-    line-height: 50px;
     margin-right: 10px;
     font-style: italic;
     margin-top: 12px;

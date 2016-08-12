@@ -21,8 +21,7 @@ $(document).ready(function(){
       event.preventDefault();
   });
 
-  $('#search-action').click(function(event){
-    debugger;
+  $('#search-catalog-action').click(function(event){
     window.location.hash = '/search/' + $('.search').val();
     event.preventDefault();
   });
