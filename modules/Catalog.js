@@ -86,6 +86,7 @@ Catalog.prototype.search = function(req, res ){
 
   //Map data..
   results.issues = results.issues.map(function(issue){
+      issue.location = target_dir + issue.location;
       return { value: issue};
   });
 
